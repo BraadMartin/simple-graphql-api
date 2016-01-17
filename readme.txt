@@ -14,9 +14,11 @@ Adds a GraphQL-style read-only interface for interacting with the REST API.
 
 Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/post/13` and you get back a JSON object representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent that resource.
 
-GraphQL is a query language developed by Facebook that offers a slightly different way of asking for and receiving data about a resource. With GraphQL, you pass in an object with only the field keys you want, and the API fills up the object and passes it back to you.
+GraphQL is a query language developed by Facebook that offers a slightly different way of asking for and receiving data from a resource. With GraphQL, you pass in an object with only the field keys you want, and the API fills up the object and passes it back to you. This moves the ability to include things like custom fields (post meta) to the client, and it makes the response you get more predictable and specific to your use case.
 
-In other words, you send a GET request to:
+The concept of only getting back specific fields you ask for is potentially very powerful. This plugin implements this concept by letting you pass a query param "fields" to an endpoint `/wp-json/graph/v1/post/{:id}` consisting of a comma separated list of the fields you want, and you'll get only those fields back.
+
+In other words, you send a GET request like this:
 
 `
 /wp-json/graph/v1/post/13?fields=ID,post_title,post_content,some_custom_field
