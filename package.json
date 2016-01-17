@@ -1,0 +1,20 @@
+{
+  "name": "graphql-api",
+  "version": "1.0.0",
+  "description": "A GraphQL Interface for the WordPress REST API",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BraadMartin/graphql-api.git"
+  },
+  "authors": "Braad Martin",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/BraadMartin/graphql-api",
+  "devDependencies": {
+    "grunt-wp-i18n": "^0.5.3",
+    "grunt-wp-readme-to-markdown": "^1.0.0"
+  }
+}
