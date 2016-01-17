@@ -35,7 +35,27 @@ and you get back:
 }
 `
 
-The fields you can specify are a direct mapping to the fields on the post object when you make a standard query in WordPress. Any fields you ask for that are not valid keys on the post object will be treated as post meta keys.
+Here is a prettier way to do it using jQuery's `$.ajax()` that is also supported:
+
+`
+$.ajax({
+	url: 'http://wp.dev/wp-json/graph/v1/post/1', // Your URL goes here
+	type: 'get',
+	data: {
+		fields: [
+			'ID',
+			'post_title',
+			'post_content',
+			'some_custom_field'
+		]
+	},
+	success: function( response ) {
+		console.log( response ); // Your object will be here.
+	}
+});
+`
+
+The fields you can specify are a direct mapping to the fields on the post object when you make a standard query in WordPress. Any fields you ask for that are not valid keys on the post object will be treated as post meta keys. This allows you to ask for the custom field values you want from the client side without having to filter them into the response on the server side.
 
 At this point this plugin is just a prototype and it has very little functionality and almost zero safety as far as exposing sensitive information. Only published single posts can be accessed, the post_password field is forcibly removed from the response object, and error handling for some errors is built in, but those are the only safety mechanisms in place so use at your own risk!
 

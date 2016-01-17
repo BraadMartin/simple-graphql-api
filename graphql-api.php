@@ -9,7 +9,7 @@
  * @wordpress-plugin
  * Plugin Name:         GraphQL API
  * Plugin URI:          https://github.com/BraadMartin/graphql-api
- * Description:         Adds a GraphQL-style interface for interacting with the REST API.
+ * Description:         Adds a GraphQL-style read-only interface for interacting with the REST API.
  * Version:             1.0.0
  * Author:              Braad Martin
  * Author URI:          http://braadmartin.com
@@ -52,7 +52,7 @@ function graphql_api_get_post( WP_REST_Request $request ) {
 
 	$params   = $request->get_params();
 	$post     = get_post( (int)$params['id'] );
-	$fields   = explode( ',', $params['fields'] );
+	$fields   = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
 	$response = new stdClass();
 
 	// Only allow certain post types to be accessed.
