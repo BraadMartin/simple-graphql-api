@@ -35,7 +35,7 @@ and you get back:
 	}
 
 
-Here is a prettier way to do it using jQuery's `$.ajax()` that is also supported:
+Here is a prettier way to send the request using jQuery's `$.ajax()` that is also supported:
 
 
 	$.ajax({
