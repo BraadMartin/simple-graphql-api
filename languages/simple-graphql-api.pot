@@ -2,9 +2,10 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: GraphQL API 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/graphql-api\n"
-"POT-Creation-Date: 2016-01-19 03:35:48+00:00\n"
+"Project-Id-Version: Simple GraphQL API 1.0.0\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/simple-graphql-api\n"
+"POT-Creation-Date: 2016-01-19 08:25:32+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,20 +14,32 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: grunt-wp-i18n 0.5.3\n"
 
-#: classes/class-graphql-api.php:74 classes/class-graphql-api.php:92
-msgid "No post found with the specified ID."
+#: classes/class-simple-graphql-api.php:106
+msgid "No valid post ids specified"
 msgstr ""
 
-#: classes/class-graphql-api.php:86
-msgid "No fields passed in."
+#: classes/class-simple-graphql-api.php:112
+msgid "No valid fields specified"
+msgstr ""
+
+#: classes/class-simple-graphql-api.php:162
+msgid "No post with ID %s found"
+msgstr ""
+
+#: classes/class-simple-graphql-api.php:167
+msgid "Post with ID %s is not published"
+msgstr ""
+
+#: classes/class-simple-graphql-api.php:172
+msgid "Disallowed post type for post with ID %s"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-msgid "GraphQL API"
+msgid "Simple GraphQL API"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://github.com/BraadMartin/graphql-api"
+msgid "https://github.com/BraadMartin/simple-graphql-api"
 msgstr ""
 
 #. Description of the plugin/theme

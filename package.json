@@ -1,18 +1,18 @@
 {
-  "name": "graphql-api",
+  "name": "simple-graphql-api",
   "version": "1.0.0",
-  "description": "A GraphQL Interface for the WordPress REST API",
+  "description": "A simple read-only interface for making GraphQL-style queries with the REST API",
   "main": "Gruntfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BraadMartin/graphql-api.git"
+    "url": "https://github.com/BraadMartin/simple-graphql-api.git"
   },
   "authors": "Braad Martin",
   "license": "GPL-3.0",
-  "homepage": "https://github.com/BraadMartin/graphql-api",
+  "homepage": "https://github.com/BraadMartin/simple-graphql-api",
   "devDependencies": {
     "grunt-wp-i18n": "^0.5.3",
     "grunt-wp-readme-to-markdown": "^1.0.0"

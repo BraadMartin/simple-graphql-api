@@ -1,14 +1,14 @@
-=== GraphQL API ===
+=== Simple GraphQL API ===
 Contributors: Braad
 Donate link: http://braadmartin.com/
-Tags: graphql, graph, api, rest
+Tags: graphql, graph, api, simple, rest
 Requires at least: 4.4
 Tested up to: 4.5
 Stable tag: 1.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Adds a GraphQL-style read-only interface for interacting with the REST API.
+A simple read-only interface for making GraphQL-style queries with the REST API.
 
 == Description ==
 
@@ -61,13 +61,13 @@ At this point this plugin is just a prototype and it has very little functionali
 
 I'm still learning about GraphQL and I'm using this plugin mostly to experiment. If this plugin proves useful I would love to keep building it out and add support for interacting with the other resources besides posts (Users, Terms, and Comments) and eventually add support for making authenticated requests to actually modify resources with PUT, POST, and DELETE requests.
 
-If anyone out there finds this kind of thing interesting I'd love to work together. The plugin is on [on Github](https://github.com/BraadMartin/graphql-api "GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
+If anyone out there finds this kind of thing interesting I'd love to work together. The plugin is on [on Github](https://github.com/BraadMartin/simple-graphql-api "GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
 
 == Installation ==
 
 = Manual Installation =
 
-1. Upload the entire `/graphql-api` directory to the `/wp-content/plugins/` directory.
+1. Upload the entire `/simple-graphql-api` directory to the `/wp-content/plugins/` directory.
 1. Activate 'GraphQL API' through the 'Plugins' menu in WordPress.
 
 = Better Installation =
