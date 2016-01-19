@@ -38,7 +38,7 @@ class Simple_GraphQL_API {
 
 		register_rest_route( 'graph/v1', '/posts/(?P<ids>\d+(,\d+)*)?$', array(
 			'methods'  => 'GET',
-			'callback' => array( $this, 'post_endpoint' ),
+			'callback' => array( $this, 'posts_endpoint' ),
 		) );
 	}
 
@@ -86,7 +86,7 @@ class Simple_GraphQL_API {
 	}
 
 	/**
-	 * Build and return the API response for a post.
+	 * Build and return the API response for the /posts/ endpoint.
 	 *
 	 * @since   1.0.0
 	 *
@@ -94,7 +94,7 @@ class Simple_GraphQL_API {
 	 * @param   array   $fields  The fields to include.
 	 * @return  object           The response object.
 	 */
-	public function post_endpoint( WP_REST_Request $request ) {
+	public function posts_endpoint( WP_REST_Request $request ) {
 
 		$params = $request->get_params();
 		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
@@ -185,10 +185,12 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		// Remove the fields that should not be accessed without authentication.
 		$private_fields = array(
 			'post_password',
 		);
+		$private_fields = apply_filters( 'simple_graphql_api_disallowed_fields', $private_fields );
+
+		// Remove the fields that should not be accessed without authentication.
 		foreach ( $private_fields as $private_field ) {
 			if ( isset( $response->{$private_field} ) ) {
 				$response->{$private_field} = null;
