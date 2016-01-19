@@ -40,6 +40,11 @@ class Simple_GraphQL_API {
 			'methods'  => 'GET',
 			'callback' => array( $this, 'posts_endpoint' ),
 		) );
+
+		register_rest_route( 'graph/v1', '/comments/(?P<ids>\d+(,\d+)*)?$', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'comments_endpoint' ),
+		) );
 	}
 
 	/**
@@ -55,6 +60,7 @@ class Simple_GraphQL_API {
 		$params   = $request->get_params();
 		$response = new stdClass();
 
+		// Process a request for posts if one is included.
 		if ( ! empty( $params['posts'] ) ) {
 
 			$response->posts = array();
@@ -68,17 +74,55 @@ class Simple_GraphQL_API {
 			}
 
 			foreach ( $post_ids as $post_id ) {
-				$post = $this->get_post( $post_id, $post_fields );
+				$post = $this->get_post( (int)$post_id, $post_fields );
 
 				if ( is_object( $post ) ) {
 					$posts[] = $post;
 				} elseif ( is_string( $post ) ) {
-					$response->errors = $post;
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $post;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $post;
+					}
 				}
 			}
 
 			if ( ! empty( $posts ) ) {
 				$response->posts = $posts;
+			}
+		}
+
+		// Process a request for comments if one is included.
+		if ( ! empty( $params['comments'] ) ) {
+
+			$response->comments = array();
+			$comments           = array();
+			$comment_ids        = ( is_array( $params['comments'] ) ) ? $params['comments'] : explode( ',', $params['comments'] );
+
+			if ( ! empty( $params['comment_fields'] ) ) {
+				$comment_fields = ( is_array( $params['comment_fields'] ) ) ? $params['comment_fields'] : explode( ',', $params['comment_fields'] );
+			} else {
+				$comment_fields = array();
+			}
+
+			foreach ( $comment_ids as $comment_id ) {
+				$comment = $this->get_comment( (int)$comment_id, $comment_fields );
+
+				if ( is_object( $comment ) ) {
+					$comments[] = $comment;
+				} elseif ( is_string( $comment ) ) {
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $comment;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $comment;
+					}
+				}
+			}
+
+			if ( ! empty( $comments ) ) {
+				$response->comments = $comments;
 			}
 		}
 
@@ -90,9 +134,8 @@ class Simple_GraphQL_API {
 	 *
 	 * @since   1.0.0
 	 *
-	 * @param   int     $id      The post ID.
-	 * @param   array   $fields  The fields to include.
-	 * @return  object           The response object.
+	 * @param   object  $request  The request object.
+	 * @return  object            The response object.
 	 */
 	public function posts_endpoint( WP_REST_Request $request ) {
 
@@ -108,8 +151,8 @@ class Simple_GraphQL_API {
 			);
 		} elseif ( empty( $fields ) ) {
 			return new WP_Error(
-				'graphql_no_fields',
-				__( 'No valid fields specified', 'simple-graphql-api' ),
+				'graphql_no_post_fields',
+				__( 'No valid post fields specified', 'simple-graphql-api' ),
 				array( 'status' => 404 )
 			);
 		}
@@ -118,13 +161,18 @@ class Simple_GraphQL_API {
 		$response = new stdClass();
 
 		foreach ( $ids as $id ) {
-			$post = $this->get_post( $id, $fields );
+			$post = $this->get_post( (int)$id, $fields );
 
 			if ( $post ) {
 				if ( is_object( $post ) ) {
 					$posts[] = $post;
 				} elseif ( is_string( $post ) ) {
-					$response->errors = $post;
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $post;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $post;
+					}
 				}
 			}
 		}
@@ -133,7 +181,62 @@ class Simple_GraphQL_API {
 			$response->posts = $posts;
 		}
 
-		return apply_filters( 'simple_graphql_api_post_endpoint', $response );
+		return apply_filters( 'simple_graphql_api_response', $response );
+	}
+
+	/**
+	 * Build and return the API response for the /comments/ endpoint.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   object  $request  The request object.
+	 * @return  object            The response object.
+	 */
+	public function comments_endpoint( WP_REST_Request $request ) {
+
+		$params = $request->get_params();
+		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		$fields = ( isset( $params['fields'] ) && is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+
+		if ( empty( $ids ) ) {
+			return new WP_Error(
+				'graphql_no_comment_ids',
+				__( 'No valid comment ids specified', 'simple-graphql-api' ),
+				array( 'status' => 404 )
+			);
+		} elseif ( empty( $fields ) ) {
+			return new WP_Error(
+				'graphql_no_comment_fields',
+				__( 'No valid comment fields specified', 'simple-graphql-api' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$comments    = array();
+		$response = new stdClass();
+
+		foreach ( $ids as $id ) {
+			$comment = $this->get_comment( (int)$id, $fields );
+
+			if ( $comment ) {
+				if ( is_object( $comment ) ) {
+					$comments[] = $comment;
+				} elseif ( is_string( $comment ) ) {
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $comment;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $comment;
+					}
+				}
+			}
+		}
+
+		if ( ! empty( $comments ) ) {
+			$response->comments = $comments;
+		}
+
+		return apply_filters( 'simple_graphql_api_response', $response );
 	}
 
 	/**
@@ -181,14 +284,12 @@ class Simple_GraphQL_API {
 			if ( isset( $post->{$field} ) ) {
 				$response->{$field} = ( isset( $post->{$field} ) ) ? $post->{$field} : null;
 			} else {
-				$response->{$field} = get_post_meta( $post->ID, $field, true );
+				$meta = get_post_meta( $post->ID, $field, true );
+				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
 			}
 		}
 
-		$private_fields = array(
-			'post_password',
-		);
-		$private_fields = apply_filters( 'simple_graphql_api_disallowed_fields', $private_fields );
+		$private_fields = $this->get_private_fields();
 
 		// Remove the fields that should not be accessed without authentication.
 		foreach ( $private_fields as $private_field ) {
@@ -198,5 +299,92 @@ class Simple_GraphQL_API {
 		}
 
 		return apply_filters( 'simple_graphql_api_post', $response );
+	}
+
+	/**
+	 * Build and return the API response for a comment.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   int     $id      The comment ID.
+	 * @param   array   $fields  The fields to include.
+	 * @return  object           The response object.
+	 */
+	public function get_comment( $id, $fields = array() ) {
+
+		$comment_args = array(
+			'comment__in' => $id,
+		);
+
+		$comment = get_comments( $comment_args );
+		$comment = ( is_array( $comment ) ) ? $comment[0] : false;
+
+		// Only allow the Core comment type to be accessed (the absence of a comment type is
+		// the Core comment type)
+		$comment_types = apply_filters( 'simple_graphql_api_comment_types', array(
+			'',
+		) );
+
+		// If the comment doesn't exist, hasn't been approved, or isn't a valid type,
+		// return an error message.
+		if ( is_wp_error( $comment ) || ! is_object( $comment ) ) {
+			return sprintf(
+				__( 'No comment with ID %s found', 'simple-graphql-api' ),
+				$id
+			);
+		} elseif ( '1' !== $comment->comment_approved ) {
+			return sprintf(
+				__( 'Comment with ID %s has not been approved', 'simple-graphql-api' ),
+				$id
+			);
+		} elseif ( ! in_array( $comment->comment_type, $comment_types ) ) {
+			return sprintf(
+				__( 'Disallowed comment type for comment with ID %s', 'simple-graphql-api' ),
+				$id
+			);
+		}
+
+		$response = new stdClass();
+
+		// First look for the field on the comment object, then look in comment meta.
+		foreach ( $fields as $field ) {
+			if ( isset( $comment->{$field} ) ) {
+				$response->{$field} = ( isset( $comment->{$field} ) ) ? $comment->{$field} : null;
+			} else {
+				$meta = get_comment_meta( $comment->ID, $field, true );
+				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
+			}
+		}
+
+		$private_fields = $this->get_private_fields();
+
+		// Remove the fields that should not be accessed without authentication.
+		foreach ( $private_fields as $private_field ) {
+			if ( isset( $response->{$private_field} ) ) {
+				$response->{$private_field} = null;
+			}
+		}
+
+		return apply_filters( 'simple_graphql_api_comment', $response );
+	}
+
+	/**
+	 * Return an array of fields that are private and should only be accessed using
+	 * authenticated requests.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @return  array  The private fields.
+	 */
+	public function get_private_fields() {
+
+		$private_fields = array(
+			'post_password',
+			'comment_author_email',
+			'comment_author_IP',
+			'comment_agent',
+		);
+
+		return apply_filters( 'simple_graphql_api_private_fields', $private_fields );
 	}
 }
