@@ -501,7 +501,16 @@ class Simple_GraphQL_API {
 		// First look for the field on the comment object, then look in comment meta.
 		foreach ( $fields as $field ) {
 			if ( isset( $comment->{$field} ) ) {
-				$response->{$field} = ( isset( $comment->{$field} ) ) ? $comment->{$field} : null;
+
+				// If we're returning the comment_content, run it through the right filters.
+				if ( 'comment_content' === $field ) {
+					$response->comment_content             = array();
+					$response->comment_content['raw']      = $comment->comment_content;
+					$response->comment_content['rendered'] = apply_filters( 'comment_text', $comment->comment_content, $comment );
+				} else {
+					$response->{$field} = ( isset( $comment->{$field} ) ) ? $comment->{$field} : null;
+				}
+
 			} else {
 				$meta = get_comment_meta( $comment->ID, $field, true );
 				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';

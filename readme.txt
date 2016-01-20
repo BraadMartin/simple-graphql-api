@@ -114,7 +114,10 @@ Results in:
     {
       "comment_ID": "1",
       "comment_author": "Mr WordPress",
-      "comment_content": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them."
+      "comment_content": {
+        "raw": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.",
+        "rendered": "<p>Hi, this is a comment.<br />\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.</p>\n"
+      }
     }
   ]
 }
@@ -163,7 +166,10 @@ Results in:
   "comments": [
     {
       "comment_ID": "1",
-      "comment_content": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them."
+      "comment_content": {
+        "raw": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.",
+        "rendered": "<p>Hi, this is a comment.<br />\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.</p>\n"
+      }
     }
   ]
 }
@@ -199,7 +205,10 @@ Results in:
   "comments": [
     {
       "comment_ID": "1",
-      "comment_content": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them."
+      "comment_content": {
+        "raw": "Hi, this is a comment.\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.",
+        "rendered": "<p>Hi, this is a comment.<br />\nTo delete a comment, just log in and view the post&#039;s comments. There you will have the option to edit or delete them.</p>\n"
+      }
     }
   ]
 }
