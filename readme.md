@@ -147,7 +147,7 @@ Results in:
 	}
 
 
-If you as for any resources that don't exist, you'll also get back an `errors` key on the response object. This key will contain an array of any error messages that occured. For example:
+If you pass an ID for any resource that doesn't exist, you'll also get back an `errors` key on the response object. This key will contain an array of any error messages that occured. For example:
 
 
 	/wp-json/graph/v1/any/?posts=1,13&post_fields=ID,post_title,post_content&comments=1,5&comment_fields=comment_ID,comment_content
