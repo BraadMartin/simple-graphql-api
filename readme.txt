@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types.
+A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types in a single request.
 
 == Description ==
 
