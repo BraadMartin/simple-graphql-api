@@ -41,6 +41,11 @@ class Simple_GraphQL_API {
 			'callback' => array( $this, 'posts_endpoint' ),
 		) );
 
+		register_rest_route( 'graph/v1', '/terms/(?P<ids>\d+(,\d+)*)?$', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'terms_endpoint' ),
+		) );
+
 		register_rest_route( 'graph/v1', '/comments/(?P<ids>\d+(,\d+)*)?$', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'comments_endpoint' ),
@@ -90,6 +95,39 @@ class Simple_GraphQL_API {
 
 			if ( ! empty( $posts ) ) {
 				$response->posts = $posts;
+			}
+		}
+
+		// Process a request for terms if one is included.
+		if ( ! empty( $params['terms'] ) ) {
+
+			$response->terms = array();
+			$terms           = array();
+			$term_ids        = ( is_array( $params['terms'] ) ) ? $params['terms'] : explode( ',', $params['terms'] );
+
+			if ( ! empty( $params['term_fields'] ) ) {
+				$term_fields = ( is_array( $params['term_fields'] ) ) ? $params['term_fields'] : explode( ',', $params['term_fields'] );
+			} else {
+				$term_fields = array();
+			}
+
+			foreach ( $term_ids as $term_id ) {
+				$term = $this->get_term( (int)$term_id, $term_fields );
+
+				if ( is_object( $term ) ) {
+					$terms[] = $term;
+				} elseif ( is_string( $term ) ) {
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $term;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $term;
+					}
+				}
+			}
+
+			if ( ! empty( $terms ) ) {
+				$response->terms = $terms;
 			}
 		}
 
@@ -179,6 +217,61 @@ class Simple_GraphQL_API {
 
 		if ( ! empty( $posts ) ) {
 			$response->posts = $posts;
+		}
+
+		return apply_filters( 'simple_graphql_api_response', $response );
+	}
+
+	/**
+	 * Build and return the API response for the /terms/ endpoint.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   object  $request  The request object.
+	 * @return  object            The response object.
+	 */
+	public function terms_endpoint( WP_REST_Request $request ) {
+
+		$params = $request->get_params();
+		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		$fields = ( isset( $params['fields'] ) && is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+
+		if ( empty( $ids ) ) {
+			return new WP_Error(
+				'graphql_no_term_ids',
+				__( 'No valid term ids specified', 'simple-graphql-api' ),
+				array( 'status' => 404 )
+			);
+		} elseif ( empty( $fields ) ) {
+			return new WP_Error(
+				'graphql_no_term_fields',
+				__( 'No valid term fields specified', 'simple-graphql-api' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$posts    = array();
+		$response = new stdClass();
+
+		foreach ( $ids as $id ) {
+			$term = $this->get_term( (int)$id, $fields );
+
+			if ( $term ) {
+				if ( is_object( $term ) ) {
+					$terms[] = $term;
+				} elseif ( is_string( $term ) ) {
+					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
+						$response->errors[] = $term;
+					} else {
+						$response->errors = array();
+						$response->errors[] = $term;
+					}
+				}
+			}
+		}
+
+		if ( ! empty( $terms ) ) {
+			$response->terms = $terms;
 		}
 
 		return apply_filters( 'simple_graphql_api_response', $response );
@@ -299,6 +392,51 @@ class Simple_GraphQL_API {
 		}
 
 		return apply_filters( 'simple_graphql_api_post', $response );
+	}
+
+	/**
+	 * Build and return the API response for a term.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   int     $id      The term ID.
+	 * @param   array   $fields  The fields to include.
+	 * @return  object           The response object.
+	 */
+	public function get_term( $id, $fields = array() ) {
+
+		$term = get_term( $id );
+
+		// If the term doesn't exist, return an error.
+		if ( is_wp_error( $term ) || ! is_object( $term ) ) {
+			return sprintf(
+				__( 'No term with ID %s found', 'simple-graphql-api' ),
+				$id
+			);
+		}
+
+		$response = new stdClass();
+
+		// First look for the field on the term object, then look in term meta.
+		foreach ( $fields as $field ) {
+			if ( isset( $term->{$field} ) ) {
+				$response->{$field} = ( isset( $term->{$field} ) ) ? $term->{$field} : null;
+			} else {
+				$meta = get_term_meta( $id, $field, true );
+				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
+			}
+		}
+
+		$private_fields = $this->get_private_fields();
+
+		// Remove the fields that should not be accessed without authentication.
+		foreach ( $private_fields as $private_field ) {
+			if ( isset( $response->{$private_field} ) ) {
+				$response->{$private_field} = null;
+			}
+		}
+
+		return apply_filters( 'simple_graphql_api_term', $response );
 	}
 
 	/**
