@@ -305,7 +305,7 @@ class Simple_GraphQL_API {
 			);
 		}
 
-		$comments    = array();
+		$comments = array();
 		$response = new stdClass();
 
 		foreach ( $ids as $id ) {
