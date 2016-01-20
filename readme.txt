@@ -33,14 +33,24 @@ and you get back:
   "posts": [
     {
       "ID": 13,
-      "post_title": "GraphQL FTW",
-      "post_content": "When you only want certain fields, consider GraphQL.",
+      "post_title": {
+        "raw": "GraphQL FTW",
+        "rendered": "GraphQL FTW"
+      "post_content": {
+        "raw": "When you only want certain fields, consider GraphQL.",
+        "rendered": "<p>When you only want certain fields, consider GraphQL.</p>\n"
+      }
       "some_custom_field": "Oh yeah, custom fields work too"
     },
     {
       "ID": 17,
-      "post_title": "Multiple posts at a time? No problem",
-      "post_content": "Query posts, terms, comments, and users in a single request using the /any/ endpoint.",
+      "post_title": {
+        "raw": "Multiple posts at a time? No problem",
+        "rendered": "Multiple posts at a time? No problem"
+      "post_content": {
+        "raw": "Query posts, terms, comments, and users in a single request using the /any/ endpoint.",
+        "rendered": "<p>Query posts, terms, comments, and users in a single request using the /any/ endpoint.</p>\n"
+      }
       "some_custom_field": ""
     }
   ]
@@ -123,13 +133,25 @@ Results in:
   "posts": [
     {
       "ID": 1,
-      "post_title": "Hello world!",
-      "post_content": "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+      "post_title": {
+        "raw": "Hello world!",
+        "rendered": "Hello world!"
+      },
+      "post_content": {
+        "raw": "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!",
+        "rendered": "<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>\n"
+      }
     },
     {
       "ID": 2,
-      "post_title": "Sample Page",
-      "post_content": "This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:\n\n<blockquote>Hi there! I'm a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like pi&#241;a coladas. (And gettin' caught in the rain.)</blockquote>\n\n...or something like this:\n\n<blockquote>The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community.</blockquote>\n\nAs a new WordPress user, you should go to <a href=\"http://wp.dev/wp-admin/\">your dashboard</a> to delete this page and create new pages for your content. Have fun!"
+      "post_title": {
+        "raw": "Sample Page",
+        "rendered": "Sample Page"
+      },
+      "post_content": {
+        "raw": "This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:\n\n<blockquote>Hi there! I'm a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like pi&#241;a coladas. (And gettin' caught in the rain.)</blockquote>\n\n...or something like this:\n\n<blockquote>The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community.</blockquote>\n\nAs a new WordPress user, you should go to <a href=\"http://wp.dev/wp-admin/\">your dashboard</a> to delete this page and create new pages for your content. Have fun!",
+        "rendered": "<p>This is an example page. It&#8217;s different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:</p>\n<blockquote><p>Hi there! I&#8217;m a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like pi&#241;a coladas. (And gettin&#8217; caught in the rain.)</p></blockquote>\n<p>&#8230;or something like this:</p>\n<blockquote><p>The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community.</p></blockquote>\n<p>As a new WordPress user, you should go to <a href=\"http://wp.dev/wp-admin/\">your dashboard</a> to delete this page and create new pages for your content. Have fun!</p>\n"
+      }
     }
   ],
   "terms": [
@@ -160,8 +182,14 @@ Results in:
   "posts": [
     {
       "ID": 1,
-      "post_title": "Hello world!",
-      "post_content": "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+      "post_title": {
+        "raw": "Hello world!",
+        "rendered": "Hello world!"
+      },
+      "post_content": {
+        "raw": "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!",
+        "rendered": "<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>\n"
+      }
     }
   ],
   "errors": [

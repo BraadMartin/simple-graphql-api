@@ -375,7 +375,21 @@ class Simple_GraphQL_API {
 		// First look for the field on the post object, then look in post meta.
 		foreach ( $fields as $field ) {
 			if ( isset( $post->{$field} ) ) {
-				$response->{$field} = ( isset( $post->{$field} ) ) ? $post->{$field} : null;
+
+				// If we are returning post_title or post_content, run it through the right filters
+				// and return both a raw and rendered version to match the REST API.
+				if ( 'post_content' === $field ) {
+					$response->post_content             = array();
+					$response->post_content['raw']      = $post->post_content;
+					$response->post_content['rendered'] = apply_filters( 'the_content', $post->post_content );
+				} elseif ( 'post_title' === $field ) {
+					$response->post_title             = array();
+					$response->post_title['raw']      = $post->post_title;
+					$response->post_title['rendered'] = get_the_title( $post->ID );
+				} else {
+					$response->{$field} = ( isset( $post->{$field} ) ) ? $post->{$field} : null;
+				}
+
 			} else {
 				$meta = get_post_meta( $post->ID, $field, true );
 				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
