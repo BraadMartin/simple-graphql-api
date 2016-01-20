@@ -67,7 +67,7 @@ Here is a prettier way to send the request using jQuery's `$.ajax()` that is als
 	});
 
 
-As of 1/19/16, 3 of the 4 core WordPress objects are supported, including Posts, Terms, and Comments. Support for Users is planned, but currently the plugin provides read-only access and supports only unauthenticated requests, and Users should only be accessed via authenticated requests.
+As of 1/19/16, 3 of the 4 core WordPress objects are supported, including Posts, Terms, and Comments. Support for Users is planned, but currently the plugin only provides read-only access and supports unauthenticated requests, and Users should really only be accessed via authenticated requests, so this will likely come later as part of a larger support for making authenticated requests.
 
 Terms and comments can be queried just like posts:
 
