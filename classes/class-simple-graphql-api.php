@@ -164,7 +164,7 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		return apply_filters( 'simple_graphql_api_response', $response );
+		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class Simple_GraphQL_API {
 			$response->posts = $posts;
 		}
 
-		return apply_filters( 'simple_graphql_api_response', $response );
+		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
 	/**
@@ -274,7 +274,7 @@ class Simple_GraphQL_API {
 			$response->terms = $terms;
 		}
 
-		return apply_filters( 'simple_graphql_api_response', $response );
+		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
 	/**
@@ -329,7 +329,7 @@ class Simple_GraphQL_API {
 			$response->comments = $comments;
 		}
 
-		return apply_filters( 'simple_graphql_api_response', $response );
+		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
 	/**
@@ -405,7 +405,7 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		return apply_filters( 'simple_graphql_api_post', $response );
+		return apply_filters( 'simple_graphql_api_post', $response, $post, $id );
 	}
 
 	/**
@@ -450,7 +450,7 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		return apply_filters( 'simple_graphql_api_term', $response );
+		return apply_filters( 'simple_graphql_api_term', $response, $term, $id );
 	}
 
 	/**
@@ -526,7 +526,7 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		return apply_filters( 'simple_graphql_api_comment', $response );
+		return apply_filters( 'simple_graphql_api_comment', $response, $comment, $id );
 	}
 
 	/**
