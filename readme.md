@@ -23,7 +23,7 @@ This plugin is an experiment that takes a more GraphQL-style approach. It lets y
 Simply pass one or multiple resource ids and the query param "fields" to endpoints for posts, terms, and comments, or send special query params to the /any/ endpoint to query multiple resources across multiple resource types in a single request, and you'll get back exactly what you ask for. The endpoints supported by this plugin include:
 
 
-	/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx
+	/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx&term_fields=xxx,xxx&comment_fields=xxx,xxx
 	
 	/wp-json/graph/v1/terms/{:ids}?fields=xxx,xxx
 	
