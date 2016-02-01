@@ -32,7 +32,7 @@ Simply pass one or multiple resource ids and the query param "fields" to endpoin
 /wp-json/graph/v1/any/?posts={:ids}&post_fields=xxx,xxx&terms={:ids}&term_fields=xxx,xxx&comments={:ids}&comment_fields=xxx,xxx
 `
 
-To query the */posts/* endpoint send a request to `/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx` where `{:ids}` is a comma separated list of the post ids you want and `xxx,xxx` is a comma separated list of the fields you want, and you'll get only those fields back.
+To query the **/posts/** endpoint send a request to `/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx` where `{:ids}` is a comma separated list of the post ids you want and `xxx,xxx` is a comma separated list of the fields you want, and you'll get only those fields back.
 
 Request:
 
@@ -91,7 +91,7 @@ $.ajax({
 });
 `
 
-As of 2/1/16 this plugin supports 3 of the 4 core WordPress resources: *Posts*, *Terms*, and *Comments*. Support for *Users* is planned but Users should really only be accessed with authenticated requests, and right now this plugin only offers a read-only interface (only GET requests), so this will likely come later as part of a larger push to add support for authenticated requests.
+As of 2/1/16 this plugin supports 3 of the 4 core WordPress resources: **Posts**, **Terms**, and **Comments**. Support for **Users** is planned but Users should really only be accessed with authenticated requests, and right now this plugin only offers a read-only interface (only GET requests), so this will likely come later as part of a larger push to add support for authenticated requests.
 
 Terms and comments can be queried just like posts:
 
@@ -139,7 +139,7 @@ Results in:
 }
 `
 
-Querying multiple posts, terms, and comments at a time is alright, but the true power of GraphQL lies in the ability to query across resource types. This plugin implements this ability with the */any/* endpoint. This endpoint accepts params `posts`, `post_fields`, `terms`, `term_fields`, `comments`, and `comment_fields`, and can be queried like this:
+Querying multiple posts, terms, and comments at a time is alright, but the true power of GraphQL lies in the ability to query across resource types. This plugin implements this ability with the **/any/** endpoint. This endpoint accepts params `posts`, `post_fields`, `terms`, `term_fields`, `comments`, and `comment_fields`, and can be queried like this:
 
 `
 /wp-json/graph/v1/any/?posts=1,2&post_fields=ID,post_title,post_content&comments=1&comment_fields=comment_ID,comment_content&terms=3&term_fields=term_id,name
