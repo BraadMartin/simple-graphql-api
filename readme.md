@@ -232,7 +232,7 @@ Results in:
 
 The fields you can specify are a direct mapping to the fields on the post, term, and comment objects you get when you call `get_post()`, `get_term()`, and `get_comments()` in WordPress. Any fields you ask for that are not valid keys on the post/term/comment object will be treated as meta keys, and any matching meta values will be included in the response.
 
-You may have noticed that the fundamental query mechanism revolves around resource IDs, but the most common use case for most WordPress sites is getting a collection of posts or a specific post and also the terms and comments associated with that post, and it would be a shame to have to make multiple requests to get all of this at once. This plugin supports this specific use case in a couple of ways. To get the term IDs and comment IDs associated with a post you can simply pass "terms" and "comments" as fields you want when querying the /posts/ endpoint:
+You may have noticed that the fundamental query mechanism revolves around resource IDs, but the common use case for most WordPress sites is getting a collection of posts or a specific post and also the terms and comments associated with that post, and it would be a shame to have to make multiple requests to get all of this at once. This plugin supports this specific use case in a couple of ways. To get the term IDs and comment IDs associated with a post you can simply pass "terms" and "comments" as fields you want when querying the /posts/ endpoint:
 
 
 	/wp-json/graph/v1/posts/1?fields=ID,post_title,terms,comments
