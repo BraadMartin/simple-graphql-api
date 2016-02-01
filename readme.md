@@ -312,11 +312,11 @@ If anyone out there finds this kind of thing interesting I'd love to work togeth
 ### Manual Installation ###
 
 1. Upload the entire `/simple-graphql-api` directory to the `/wp-content/plugins/` directory.
-1. Activate 'GraphQL API' through the 'Plugins' menu in WordPress.
+1. Activate 'Simple GraphQL API' through the 'Plugins' menu in WordPress.
 
 ### Better Installation ###
 
-1. Go to Plugins > Add New in your WordPress admin and search for 'GraphQL API'.
+1. Go to Plugins > Add New in your WordPress admin and search for 'Simple GraphQL API'.
 1. Click Install.
 
 ## Frequently Asked Questions ##
