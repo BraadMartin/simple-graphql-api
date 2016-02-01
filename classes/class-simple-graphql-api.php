@@ -389,6 +389,17 @@ class Simple_GraphQL_API {
 				} else {
 					$response->{$field} = ( isset( $post->{$field} ) ) ? $post->{$field} : null;
 				}
+			} elseif ( 'terms' === $field ) {
+
+				// If 'terms' was specified as the field, generate a comma-separated string
+				// that contains the IDs for any terms attached to the post.
+				$response->terms = $this->get_term_ids_for_post( $post );
+
+			} elseif ( 'comments' === $field ) {
+
+				// If 'comments' was specified as the field, generate a comma-separated string
+				// that contains the IDs for any comments attached to the post.
+				$response->comments = $this->get_comment_ids_for_post( $post );
 
 			} else {
 				$meta = get_post_meta( $post->ID, $field, true );
@@ -454,6 +465,57 @@ class Simple_GraphQL_API {
 	}
 
 	/**
+	 * Build and return a comma-separated list of term IDs for terms attached to a post.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   int|object  $post  The post ID or object.
+	 * @return  string             The string of term IDs or empty.
+	 */
+	public function get_term_ids_for_post( $post ) {
+
+		// Handle $post being an ID or a post object.
+		if ( is_object( $post ) ) {
+			$post_id = $post->ID;
+		} elseif ( is_int( $post ) ) {
+			$post_id = $post;
+		} else {
+			return '';
+		}
+
+		$taxonomies = get_object_taxonomies( $post );
+
+		// Return empty string if the post has no taxonomies.
+		if ( empty( $taxonomies ) ) {
+			return '';
+		}
+
+		$terms_array = array();
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$terms = get_the_terms( $post->ID, $taxonomy );
+
+			if ( empty( $terms ) ) {
+				continue;
+			}
+
+			foreach ( $terms as $term ) {
+				$terms_array[] = $term->term_id;
+			}
+		}
+
+		// Return empty string if the post has no terms.
+		if ( empty( $terms_array ) ) {
+			return '';
+		}
+
+		sort( $terms_array );
+
+		// Return a comma-separated string of the terms.
+		return implode( ',', $terms_array );
+	}
+
+	/**
 	 * Build and return the API response for a comment.
 	 *
 	 * @since   1.0.0
@@ -466,6 +528,7 @@ class Simple_GraphQL_API {
 
 		$comment_args = array(
 			'comment__in' => $id,
+			'status'      => '1',
 		);
 
 		$comment = get_comments( $comment_args );
@@ -481,7 +544,7 @@ class Simple_GraphQL_API {
 		// return an error message.
 		if ( is_wp_error( $comment ) || ! is_object( $comment ) ) {
 			return sprintf(
-				__( 'No comment with ID %s found', 'simple-graphql-api' ),
+				__( 'No approved comment with ID %s found', 'simple-graphql-api' ),
 				$id
 			);
 		} elseif ( '1' !== $comment->comment_approved ) {
@@ -527,6 +590,44 @@ class Simple_GraphQL_API {
 		}
 
 		return apply_filters( 'simple_graphql_api_comment', $response, $comment, $id );
+	}
+
+	/**
+	 * Build and return a comma-separated list of comment IDs for comments attached to a post.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   int|object  $post  The post ID or object.
+	 * @return  string             The string of comment IDs or empty.
+	 */
+	public function get_comment_ids_for_post( $post ) {
+
+		// Handle $post being an ID or a post object.
+		if ( is_object( $post ) ) {
+			$post_id = $post->ID;
+		} elseif ( is_int( $post ) ) {
+			$post_id = $post;
+		} else {
+			return '';
+		}
+
+		$comments = get_approved_comments( $post_id );
+
+		// Return empty string if the post has no comments.
+		if ( empty( $comments ) ) {
+			return '';
+		}
+
+		$comments_array = array();
+
+		foreach ( $comments as $comment ) {
+			$comments_array[] = $comment->comment_ID;
+		}
+
+		sort( $comments_array );
+
+		// Return a comma-separated string of comment IDs.
+		return implode( ',', $comments_array );
 	}
 
 	/**
