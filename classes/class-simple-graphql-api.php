@@ -177,9 +177,24 @@ class Simple_GraphQL_API {
 	 */
 	public function posts_endpoint( WP_REST_Request $request ) {
 
-		$params = $request->get_params();
-		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
-		$fields = ( isset( $params['fields'] ) && is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		$params         = $request->get_params();
+		$ids            = array();
+		$fields         = array();
+		$term_fields    = array();
+		$comment_fields = array();
+
+		if ( isset( $params['ids'] ) ) {
+			$ids = ( is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		}
+		if ( isset( $params['fields'] ) ) {
+			$fields = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		}
+		if ( isset( $params['term_fields'] ) ) {
+			$term_fields = ( is_array( $params['term_fields'] ) ) ? $params['term_fields'] : explode( ',', $params['term_fields'] );
+		}
+		if ( isset( $params['comment_fields'] ) ) {
+			$comment_fields = ( is_array( $params['comment_fields'] ) ) ? $params['comment_fields'] : explode( ',', $params['comment_fields'] );
+		}
 
 		if ( empty( $ids ) ) {
 			return new WP_Error(
@@ -196,6 +211,8 @@ class Simple_GraphQL_API {
 		}
 
 		$posts    = array();
+		$terms    = array();
+		$comments = array();
 		$response = new stdClass();
 
 		foreach ( $ids as $id ) {
@@ -203,7 +220,32 @@ class Simple_GraphQL_API {
 
 			if ( $post ) {
 				if ( is_object( $post ) ) {
-					$posts[] = $post;
+					$posts[]     = $post;
+
+					// Add any terms if terms was a requested field and term_fields was a valid query param.
+					if ( ! empty( $post->terms ) && ! empty( $term_fields ) ) {
+						$term_ids = explode( ',', $post->terms );
+						foreach ( $term_ids as $term_id ) {
+							$term = $this->get_term( $term_id, $term_fields );
+
+							if ( is_object( $term ) ) {
+								$terms[] = $term;
+							}
+						}
+					}
+
+					// Add any comments if comments was a requested field and comment_fields was a valid query param.
+					if ( ! empty( $post->comments ) && ! empty( $comment_fields ) ) {
+						$comment_ids = explode( ',', $post->comments );
+						foreach ( $comment_ids as $commend_id ) {
+							$comment = $this->get_comment( $comment_id, $comment_fields );
+
+							if ( is_object( $comment ) ) {
+								$comments[] = $comment;
+							}
+						}
+					}
+
 				} elseif ( is_string( $post ) ) {
 					if ( isset( $response->errors ) && is_array( $response->errors ) ) {
 						$response->errors[] = $post;
@@ -217,6 +259,12 @@ class Simple_GraphQL_API {
 
 		if ( ! empty( $posts ) ) {
 			$response->posts = $posts;
+		}
+		if ( ! empty( $terms ) ) {
+			$response->terms = $terms;
+		}
+		if ( ! empty( $comments ) ) {
+			$response->comments = $comments;
 		}
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
@@ -337,9 +385,9 @@ class Simple_GraphQL_API {
 	 *
 	 * @since   1.0.0
 	 *
-	 * @param   int     $id      The post ID.
-	 * @param   array   $fields  The fields to include.
-	 * @return  object           The response object.
+	 * @param   int     $id              The post ID.
+	 * @param   array   $fields          The fields to include.
+	 * @return  object                   The response object.
 	 */
 	public function get_post( $id, $fields = array() ) {
 
@@ -415,6 +463,8 @@ class Simple_GraphQL_API {
 				$response->{$private_field} = null;
 			}
 		}
+
+		// 
 
 		return apply_filters( 'simple_graphql_api_post', $response, $post, $id );
 	}
@@ -531,8 +581,8 @@ class Simple_GraphQL_API {
 			'status'      => '1',
 		);
 
-		$comment = get_comments( $comment_args );
-		$comment = ( is_array( $comment ) ) ? $comment[0] : false;
+		$comments = get_comments( $comment_args );
+		$comment = ( is_array( $comments ) ) ? $comments[0] : false;
 
 		// Only allow the Core comment type to be accessed (the absence of a comment type is
 		// the Core comment type)
