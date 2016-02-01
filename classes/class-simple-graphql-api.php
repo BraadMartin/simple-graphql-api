@@ -237,7 +237,7 @@ class Simple_GraphQL_API {
 					// Add any comments if comments was a requested field and comment_fields was a valid query param.
 					if ( ! empty( $post->comments ) && ! empty( $comment_fields ) ) {
 						$comment_ids = explode( ',', $post->comments );
-						foreach ( $comment_ids as $commend_id ) {
+						foreach ( $comment_ids as $comment_id ) {
 							$comment = $this->get_comment( $comment_id, $comment_fields );
 
 							if ( is_object( $comment ) ) {
@@ -463,8 +463,6 @@ class Simple_GraphQL_API {
 				$response->{$private_field} = null;
 			}
 		}
-
-		// 
 
 		return apply_filters( 'simple_graphql_api_post', $response, $post, $id );
 	}
