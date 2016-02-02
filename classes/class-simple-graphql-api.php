@@ -787,9 +787,12 @@ class Simple_GraphQL_API {
 
 		$private_fields = array(
 			'post_password',
+			'_edit_last',
+			'_edit_lock',
 			'comment_author_email',
 			'comment_author_IP',
 			'comment_agent',
+			'user_id',
 		);
 
 		return apply_filters( 'simple_graphql_api_private_fields', $private_fields );
