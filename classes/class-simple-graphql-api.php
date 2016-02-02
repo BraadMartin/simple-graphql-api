@@ -74,6 +74,16 @@ class Simple_GraphQL_API {
 
 			if ( ! empty( $params['post_fields'] ) ) {
 				$post_fields = ( is_array( $params['post_fields'] ) ) ? $params['post_fields'] : explode( ',', $params['post_fields'] );
+
+				// If 'default' is present as a field, add the default fields.
+				if ( in_array( 'default', $post_fields ) ) {
+
+					// Remove the 'default' field from $post_fields.
+					$post_fields = array_diff( $post_fields, array( 'default' ) );
+
+					// Merge in the default fields.
+					$post_fields = array_merge( $this->get_default_post_fields( $request ), $post_fields );
+				}
 			} else {
 				$post_fields = array();
 			}
@@ -107,6 +117,16 @@ class Simple_GraphQL_API {
 
 			if ( ! empty( $params['term_fields'] ) ) {
 				$term_fields = ( is_array( $params['term_fields'] ) ) ? $params['term_fields'] : explode( ',', $params['term_fields'] );
+
+				// If 'default' is present as a field, add the default fields.
+				if ( in_array( 'default', $term_fields ) ) {
+
+					// Remove the 'default' field from $term_fields.
+					$term_fields = array_diff( $term_fields, array( 'default' ) );
+
+					// Merge in the default fields.
+					$term_fields = array_merge( $this->get_default_term_fields( $request ), $term_fields );
+				}
 			} else {
 				$term_fields = array();
 			}
@@ -140,6 +160,16 @@ class Simple_GraphQL_API {
 
 			if ( ! empty( $params['comment_fields'] ) ) {
 				$comment_fields = ( is_array( $params['comment_fields'] ) ) ? $params['comment_fields'] : explode( ',', $params['comment_fields'] );
+
+				// If 'default' is present as a field, add the default fields.
+				if ( in_array( 'default', $comment_fields ) ) {
+
+					// Remove the 'default' field from $comment_fields.
+					$comment_fields = array_diff( $comment_fields, array( 'default' ) );
+
+					// Merge in the default fields.
+					$comment_fields = array_merge( $this->get_default_comment_fields( $request ), $comment_fields );
+				}
 			} else {
 				$comment_fields = array();
 			}
@@ -188,12 +218,42 @@ class Simple_GraphQL_API {
 		}
 		if ( isset( $params['fields'] ) ) {
 			$fields = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+
+			// If 'default' is present as a field, add the default fields.
+			if ( in_array( 'default', $fields ) ) {
+
+				// Remove the 'default' field from $fields.
+				$fields = array_diff( $fields, array( 'default' ) );
+
+				// Merge in the default fields.
+				$fields = array_merge( $this->get_default_post_fields( $request ), $fields );
+			}
 		}
 		if ( isset( $params['term_fields'] ) ) {
 			$term_fields = ( is_array( $params['term_fields'] ) ) ? $params['term_fields'] : explode( ',', $params['term_fields'] );
+
+			// If 'default' is present as a field, add the default fields.
+			if ( in_array( 'default', $term_fields ) ) {
+
+				// Remove the 'default' field from $term_fields.
+				$term_fields = array_diff( $term_fields, array( 'default' ) );
+
+				// Merge in the default fields.
+				$term_fields = array_merge( $this->get_default_term_fields( $request ), $term_fields );
+			}
 		}
 		if ( isset( $params['comment_fields'] ) ) {
 			$comment_fields = ( is_array( $params['comment_fields'] ) ) ? $params['comment_fields'] : explode( ',', $params['comment_fields'] );
+
+			// If 'default' is present as a field, add the default fields.
+			if ( in_array( 'default', $comment_fields ) ) {
+
+				// Remove the 'default' field from $comment_fields.
+				$comment_fields = array_diff( $comment_fields, array( 'default' ) );
+
+				// Merge in the default fields.
+				$comment_fields = array_merge( $this->get_default_comment_fields( $request ), $comment_fields );
+			}
 		}
 
 		if ( empty( $ids ) ) {
@@ -281,8 +341,25 @@ class Simple_GraphQL_API {
 	public function terms_endpoint( WP_REST_Request $request ) {
 
 		$params = $request->get_params();
-		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
-		$fields = ( isset( $params['fields'] ) && is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		$ids    = array();
+		$fields = array();
+
+		if ( isset( $params['ids'] ) ) {
+			$ids = ( is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		}
+		if ( isset( $params['fields'] ) ) {
+			$fields = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		}
+
+		// If 'default' is present as a field, add the default fields.
+		if ( in_array( 'default', $fields ) ) {
+
+			// Remove the 'default' field from $fields.
+			$fields = array_diff( $fields, array( 'default' ) );
+
+			// Merge in the default fields.
+			$fields = array_merge( $this->get_default_term_fields( $request ), $fields );
+		}
 
 		if ( empty( $ids ) ) {
 			return new WP_Error(
@@ -336,8 +413,25 @@ class Simple_GraphQL_API {
 	public function comments_endpoint( WP_REST_Request $request ) {
 
 		$params = $request->get_params();
-		$ids    = ( isset( $params['ids'] ) && is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
-		$fields = ( isset( $params['fields'] ) && is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		$ids    = array();
+		$fields = array();
+
+		if ( isset( $params['ids'] ) ) {
+			$ids = ( is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		}
+		if ( isset( $params['fields'] ) ) {
+			$fields = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
+		}
+
+		// If 'default' is present as a field, add the default fields.
+		if ( in_array( 'default', $fields ) ) {
+
+			// Remove the 'default' field from $fields.
+			$fields = array_diff( $fields, array( 'default' ) );
+
+			// Merge in the default fields.
+			$fields = array_merge( $this->get_default_comment_fields( $request ), $fields );
+		}
 
 		if ( empty( $ids ) ) {
 			return new WP_Error(
@@ -696,5 +790,60 @@ class Simple_GraphQL_API {
 		);
 
 		return apply_filters( 'simple_graphql_api_private_fields', $private_fields );
+	}
+
+	/**
+	 * Return an array of default fields for Posts.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   object  $request  The request object.
+	 * @return  array             The default fields for Posts.
+	 */
+	public function get_default_post_fields( WP_REST_Request $request ) {
+
+		$fields = array(
+			'ID',
+			'post_title',
+		);
+
+		return apply_filters( 'simple_graphql_api_default_post_fields', $fields, $request );
+	}
+
+	/**
+	 * Return an array of default fields for Terms.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   object  $request  The request object.
+	 * @return  array             The default fields for Terms.
+	 */
+	public function get_default_term_fields( WP_REST_Request $request ) {
+
+		$fields = array(
+			'term_id',
+			'name',
+		);
+
+		return apply_filters( 'simple_graphql_api_default_term_fields', $fields, $request );
+	}
+
+	/**
+	 * Return an array of default fields for Comments.
+	 *
+	 * @since   1.0.0
+	 *
+	 * @param   object  $request  The request object.
+	 * @return  array             The default fields for Comments.
+	 */
+	public function get_default_comment_fields( WP_REST_Request $request ) {
+
+		$fields = array(
+			'comment_ID',
+			'comment_author',
+			'comment_content',
+		);
+
+		return apply_filters( 'simple_graphql_api_default_comment_fields', $fields, $request );
 	}
 }
