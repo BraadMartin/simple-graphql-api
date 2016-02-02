@@ -2,7 +2,7 @@
 /**
  * Simple GraphQL API
  *
- * @package             Simple GraphQL_API
+ * @package             Simple GraphQL API
  * @author              Braad Martin
  * @license             GPL-3.0+
  *
