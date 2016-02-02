@@ -31,22 +31,25 @@ class Simple_GraphQL_API {
 	 */
 	public function register_endpoints() {
 
-		register_rest_route( 'graph/v1', '/any/', array(
+		// Allow the URL base to be customized.
+		$base = apply_filters( 'simple_graphql_api_url_base', 'graph/v1' );
+
+		register_rest_route( $base, '/any/', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'any_endpoint' ),
 		) );
 
-		register_rest_route( 'graph/v1', '/posts/(?P<ids>\d+(,\d+)*)?$', array(
+		register_rest_route( $base, '/posts/(?P<ids>\d+(,\d+)*)?$', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'posts_endpoint' ),
 		) );
 
-		register_rest_route( 'graph/v1', '/terms/(?P<ids>\d+(,\d+)*)?$', array(
+		register_rest_route( $base, '/terms/(?P<ids>\d+(,\d+)*)?$', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'terms_endpoint' ),
 		) );
 
-		register_rest_route( 'graph/v1', '/comments/(?P<ids>\d+(,\d+)*)?$', array(
+		register_rest_route( $base, '/comments/(?P<ids>\d+(,\d+)*)?$', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'comments_endpoint' ),
 		) );
