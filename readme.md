@@ -1,26 +1,30 @@
 # Simple GraphQL API #
 **Contributors:** Braad  
 **Donate link:** http://braadmartin.com/  
-**Tags:** graphql, graph, api, simple, rest  
+**Tags:** graphql, graph, api, simple, rest, json  
 **Requires at least:** 4.4  
 **Tested up to:** 4.5  
-**Stable tag:** 1.0.0  
+**Stable tag:** 0.8.0  
 **License:** GPLv3  
 **License URI:** http://www.gnu.org/licenses/gpl-3.0.html  
 
-A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types in a single request.
+A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types in a single request and designing custom objects.
 
 ## Description ##
 
 This plugin is all about easily designing custom API responses for the core WordPress resources from both the client and server side.
 
-Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/post/13` and you get back a JSON object representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent the current "state" of that resource.
+Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/post/13` and you get back a JSON representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent the current "state" of that resource.
 
-GraphQL is a query language/API interface developed by Facebook that offers a different way of asking for and receiving data from a resource. With GraphQL you pass in an object with only the field keys you want, and the API fills up the object and passes it back to you. This allows you to define the object you want to work with from the client side, and simply let the API do the work of filling up the fields you ask for.
+GraphQL is a query language/API interface developed by Facebook that offers a different way of asking for and receiving data for a resource. With GraphQL you pass in an object with only the field keys you want, and the API fills up the object and passes it back to you. This allows you to define the object you want to work with from the client side, and simply let the API do the work of filling up the fields you ask for.
 
-In the context of WordPress resources (posts, terms, comments, and users), there are always the core fields plus any meta fields on each of the 4 main resources. When using the core REST API endpoints you would register any extra custom fields (meta) you want in the response on the server side in PHP, and this is easily done and works great for many use cases. This allows you to define the object you want to work with on the server side by adding fields, but you would never want to remove any of the core fields from the response because this would be disruptive to any other applications trying to connect to the site over the REST API and expecting certain fields to be there, so there is always a minimum of data you'll get back in the response.
+In the context of the 4 main WordPress resources (Posts, Terms, Comments, and Users), there are always the core fields plus any meta fields. If you want to add any extra meta fields ("custom fields") to the response you get from the core REST API endpoints you would register the extra fields you want in the response on the server side in PHP, and this is easily done and works great for many use cases. This allows you to define the object you want to work with on the server side by adding fields, but you would never want to remove any of the core fields from the response because this would be disruptive to any other applications trying to connect to the site over the REST API and expecting certain fields to be there, so there is always a minimum of data you'll get back in the response and some of that data your app or website might not actually use.
 
-This plugin is an experiment that takes an approach inspired by GraphQL. It lets you ask for specific fields on the core resources without regard for whether live in the primary table (posts, terms, comments, users) or in the meta tables (postmeta, termmeta, commentmeta, usermeta), and without requiring any prior field registration on the server side. This allows you to define the object you want to work with on the client side, it makes the response more predictable and specific to your use case, and it naturally leads to smaller responses, all while taking advantage of the same object caching used by the REST API. You can also specify default fields using a few filters explained below and then pass the keyword `default` as a field you want and you'll get the defaults you've set up in addition to any other fields you ask for, making this plugin a tool you can use to define truly custom objects that span multiple WordPress core resource types.
+This plugin is an experiment that takes an approach inspired by GraphQL to optimize the data returned in the response and provide flexibility from the client side when making the request. It lets you ask for specific fields on the core resources without regard for whether they live in the primary table (posts, terms, comments, users) or in the meta tables (postmeta, termmeta, commentmeta, usermeta), and without requiring any prior field registration on the server side. This allows you to define the object you want to work with from the client side and craft responses that are specific to your use case, and it naturally leads to smaller responses, all while taking advantage of the same object caching used by the REST API.
+
+This plugin also supports setting default fields for each resource using a few filters explained below and then passing the keyword `default` as a field name in the request. You'll get back the defaults you've set up in addition to any other fields you ask for, making this plugin a tool you can use to define custom objects that you can build upon from the client side and that can span multiple WordPress core resource types.
+
+Note: Development of this plugin is ongoing and breaking changes may come before 1.0. See the **Development Plans** section below for more information.
 
 ### Usage ###
 
@@ -239,15 +243,19 @@ Results in:
 
 ### Fields ###
 
-The fields you can specify are a direct mapping to the fields on the post, term, and comment objects you get when you call `get_post()`, `get_term()`, and `get_comments()` in WordPress. Any fields you ask for that are not valid keys on the post/term/comment object will be treated as meta keys, and any matching meta values will be included in the response.
+The fields you can specify are a direct mapping to the fields on the post, term, and comment objects you get when you call `get_post()`, `get_term()`, and `get_comments()` in WordPress. Any fields you ask for that are not valid keys on the post/term/comment object will be treated as meta keys, and any matching meta values will be included in the response. This means that there is no formal distinction between core fields and meta fields. There are only field names, and they either have a matching value or they don't.
+
+Blurring the distinction between core fields and meta fields like this lets you think about custom resource objects in purely abstract terms. From the perspective of the API the basic resource types (Posts, Terms, and Comments) don't have any defined structure other than what you want them to have. You have complete freedom to make use of only the fields you care about and ignore the rest.
+
+It is always recommended, however, to be aware of whether your fields are living on the WordPress resource itself (in the main posts, terms, and comments tables) or in meta (in the postmeta, termmeta, or commentmeta tables). Responses will generally always be faster when less meta is involved, so abuse the core fields before abusing meta if possible.
 
 ### Special Keywords ###
 
-This plugin includes special keywords **terms**, **comments**, and **default** that you can pass as field names to allow for specific use cases.
+This plugin includes special keywords **terms**, **comments**, and **default** that you can pass as field names to support specific use cases.
 
 The fundamental query mechanism with Simple GraphQL API revolves around resource IDs, but a common use case for WordPress sites is getting a collection of posts or a specific post and also wanting the terms and comments associated with that post. It would be a shame to have to make multiple requests to get all of this at once. This plugin supports this use case with the **terms** and **comments** keywords.
 
-To get the term IDs and comment IDs associated with a post you can simply pass "terms" and "comments" as fields you want when querying the /posts/ endpoint:
+To get the term IDs and comment IDs associated with a post you can simply pass "terms" and "comments" as fields you want when querying the `/posts/` endpoint:
 
 
 	/wp-json/graph/v1/posts/1?fields=ID,post_title,terms,comments
@@ -395,7 +403,7 @@ Building the default objects is as simple as:
 
 ### Security ###
 
-At this point this plugin is just a prototype and it has only very simple functionality and almost zero safety as far as exposing sensitive information. From the wp_posts table only published single posts and pages can be accessed, from the wp_comments table only approved comments can be accessed, the `post_password`, `_edit_last`, `_edit_lock`, `comment_author_email`, `comment_author_IP`, `comment_agent`, and `user_id` fields are forcibly removed from the response object, and error handling for some errors is built in, but those are the only safety mechanisms in place so please use at your own risk!
+This plugin is currently still a prototype and it has only very simple functionality and almost zero safety as far as exposing sensitive information. From the wp_posts table only published single posts and pages can be accessed, from the wp_comments table only approved comments can be accessed, the `post_password`, `_edit_last`, `_edit_lock`, `comment_author_email`, `comment_author_IP`, `comment_agent`, and `user_id` fields are forcibly removed from the response object, and error handling for some errors is built in, but those are the only safety mechanisms in place so please use at your own risk!
 
 You can use the `simple_graphql_api_private_fields` filter to specifically disallow any core fields or meta keys from the response across all the `/graph/` endpoints, and this is highly recommended if you store sensitive information in meta.
 
@@ -407,9 +415,11 @@ Please be safe when using this plugin, and don't expose more data than you mean 
 
 ### Development Plan ###
 
-I'm still learning about GraphQL and I'm using this plugin mostly to experiment. If this plugin proves useful I would love to keep building it out and add support for interacting with User resources and making authenticated requests to actually modify resources with PUT, POST, and DELETE requests.
+I'm still learning about GraphQL and I'm using this plugin mostly to experiment. If this plugin proves useful I would love to keep building it out and add more ways to query resources (other than just by ID) and support for interacting with User resources and making authenticated requests to actually modify resources with PUT, POST, and DELETE requests.
 
-If anyone out there finds this kind of thing interesting I'd love to work together. The plugin is on [on Github](https://github.com/BraadMartin/simple-graphql-api "GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
+The first release of this plugin is version 0.8.0, with the intention that although the plugin is generally stable and ready to be used, there may be **breaking changes** made before the plugin hits 1.0. I wanted to get the plugin out there and get feedback on it early, but I know it still has a lot of room for improvement. Please help me make it better by letting me know if you find it useful and what if any changes you'd like to see.
+
+If anyone out there finds this kind of thing interesting I'd love to work together. The plugin is on [on Github](https://github.com/BraadMartin/simple-graphql-api "Simple GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
 
 ## Installation ##
 
@@ -469,10 +479,10 @@ You can use the `simple_graphql_api_private_fields` filter to customize which fi
 
 ## Changelog ##
 
-### 1.0.0 ###
+### 0.8.0 ###
 * First Release
 
 ## Upgrade Notice ##
 
-### 1.0.0 ###
+### 0.8.0 ###
 * First Release

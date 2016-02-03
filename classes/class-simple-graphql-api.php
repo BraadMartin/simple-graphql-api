@@ -2,14 +2,14 @@
 /**
  * The main Simple GraphQL API class.
  *
- * @since  1.0.0
+ * @since  0.8.0
  */
 class Simple_GraphQL_API {
 
 	/**
 	 * The constructor.
 	 *
-	 * @since  1.0.0
+	 * @since  0.8.0
 	 */
 	public function __construct() {
 
@@ -18,7 +18,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Initialize all the things.
 	 *
-	 * @since  1.0.0
+	 * @since  0.8.0
 	 */
 	public function init() {
 		add_action( 'rest_api_init', array( $this, 'register_endpoints' ) );
@@ -27,7 +27,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Register the /graph/ endpoints.
 	 *
-	 * @since  1.0.0
+	 * @since  0.8.0
 	 */
 	public function register_endpoints() {
 
@@ -58,7 +58,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for multiple resources of any type.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  object            The response object.
@@ -203,7 +203,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for the /posts/ endpoint.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  object            The response object.
@@ -336,7 +336,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for the /terms/ endpoint.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  object            The response object.
@@ -408,7 +408,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for the /comments/ endpoint.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  object            The response object.
@@ -480,7 +480,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for a post.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   int     $id              The post ID.
 	 * @param   array   $fields          The fields to include.
@@ -567,7 +567,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for a term.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   int     $id      The term ID.
 	 * @param   array   $fields  The fields to include.
@@ -612,7 +612,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return a comma-separated list of term IDs for terms attached to a post.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   int|object  $post  The post ID or object.
 	 * @return  string             The string of term IDs or empty.
@@ -663,7 +663,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return the API response for a comment.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   int     $id      The comment ID.
 	 * @param   array   $fields  The fields to include.
@@ -740,7 +740,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Build and return a comma-separated list of comment IDs for comments attached to a post.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   int|object  $post  The post ID or object.
 	 * @return  string             The string of comment IDs or empty.
@@ -779,7 +779,7 @@ class Simple_GraphQL_API {
 	 * Return an array of fields that are private and should only be accessed using
 	 * authenticated requests.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @return  array  The private fields.
 	 */
@@ -801,7 +801,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Return an array of default fields for Posts.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  array             The default fields for Posts.
@@ -819,7 +819,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Return an array of default fields for Terms.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  array             The default fields for Terms.
@@ -837,7 +837,7 @@ class Simple_GraphQL_API {
 	/**
 	 * Return an array of default fields for Comments.
 	 *
-	 * @since   1.0.0
+	 * @since   0.8.0
 	 *
 	 * @param   object  $request  The request object.
 	 * @return  array             The default fields for Comments.
