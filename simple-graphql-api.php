@@ -25,11 +25,22 @@ define( 'SIMPLE_GRAPHQL_API_URL', plugin_dir_url( __FILE__ ) );
 
 global $wp_version;
 
-// Only include and initialize the main plugin class if the API infrastructure is there.
+// Only run the plugin if the API infrastructure is there.
 if ( version_compare( $wp_version, '4.4', '>' ) ) {
 
 	require_once SIMPLE_GRAPHQL_API_PATH . 'classes/class-simple-graphql-api.php';
 
+	add_action( 'plugins_loaded', 'simple_graphql_api_load_plugin_textdomain' );
+
 	$simple_graphql_api = new Simple_GraphQL_API();
 	$simple_graphql_api->init();
+}
+
+/**
+ * Load translation files.
+ *
+ * @since  0.8.0
+ */
+function simple_graphql_api_load_plugin_textdomain() {
+	load_plugin_textdomain( 'simple-graphql-api', FALSE, SIMPLE_GRAPHQL_API_PATH . 'languages/' );
 }
