@@ -34,25 +34,29 @@ class Simple_GraphQL_API {
 		// Allow the URL base to be customized.
 		$base = apply_filters( 'simple_graphql_api_url_base', 'graph/v1' );
 
-		register_rest_route( $base, '/any/', array(
+		// Allow the args passed to register_rest_route to be customized.
+		$any_args = apply_filters( 'simple_graphql_api_any_endpoint_args', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'any_endpoint' ),
 		) );
-
-		register_rest_route( $base, '/posts/(?P<ids>\d+(,\d+)*)?$', array(
+		$posts_args = apply_filters( 'simple_graphql_api_posts_endpoint_args', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'posts_endpoint' ),
 		) );
-
-		register_rest_route( $base, '/terms/(?P<ids>\d+(,\d+)*)?$', array(
+		$terms_args = apply_filters( 'simple_graphql_api_terms_endpoint_args', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'terms_endpoint' ),
 		) );
-
-		register_rest_route( $base, '/comments/(?P<ids>\d+(,\d+)*)?$', array(
+		$comments_args = apply_filters( 'simple_graphql_api_comments_endpoint_args', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'comments_endpoint' ),
 		) );
+
+		// Register the endpoints.
+		register_rest_route( $base, '/any/', $any_args );
+		register_rest_route( $base, '/posts/(?P<ids>\d+(,\d+)*)?$', $posts_args );
+		register_rest_route( $base, '/terms/(?P<ids>\d+(,\d+)*)?$', $terms_args );
+		register_rest_route( $base, '/comments/(?P<ids>\d+(,\d+)*)?$', $comments_args );
 	}
 
 	/**
