@@ -7,12 +7,25 @@
 class Simple_GraphQL_API {
 
 	/**
+	 * Allowed Post Types.
+	 *
+	 * This will hold post types that have show_in_rest set to true.
+	 *
+	 * @since  0.8.0
+	 *
+	 * @var    array
+	 */
+	public $allowed_post_types;
+
+	/**
 	 * The constructor.
 	 *
 	 * @since  0.8.0
 	 */
 	public function __construct() {
 
+		// Set initial class properties.
+		$this->allowed_post_types = array();
 	}
 
 	/**
@@ -597,9 +610,6 @@ class Simple_GraphQL_API {
 
 		$post = get_post( (int)$id );
 
-		// Only allow certain post types to be accessed.
-		$post_types = $this->get_allowed_post_types();
-
 		// If the post doesn't exist, isn't published, or isn't a valid type,
 		// return an error message.
 		if ( is_wp_error( $post ) || ! is_object( $post ) ) {
@@ -612,9 +622,9 @@ class Simple_GraphQL_API {
 				__( 'Post with ID %s is not published', 'simple-graphql-api' ),
 				$id
 			);
-		} elseif ( ! in_array( $post->post_type, $post_types ) ) {
+		} elseif ( ! $this->check_read_permission( $post ) ) {
 			return sprintf(
-				__( 'Disallowed post type for post with ID %s', 'simple-graphql-api' ),
+				__( 'Permission denied for post with ID %s', 'simple-graphql-api' ),
 				$id
 			);
 		}
@@ -956,10 +966,30 @@ class Simple_GraphQL_API {
 	 */
 	public function get_allowed_post_types() {
 
-		return apply_filters( 'simple_graphql_api_post_types', array(
-			'post',
-			'page',
-		) );
+		// Return the array if we've built it already.
+		if ( ! empty( $this->allowed_post_types ) ) {
+			return $this->allowed_post_types;
+		}
+
+		$allowed_post_types = array();
+		$post_type_objects  = get_post_types( array( 'public' => true ), 'objects' );
+
+		// Copy the slugs of all post types that have show_in_rest set to true
+		// into our $allowed_post_types array.
+		foreach ( $post_type_objects as $post_type_object ) {
+			if ( ! empty( $post_type_object->show_in_rest ) ) {
+				$allowed_post_types[] = $post_type_object->name;
+			}
+		}
+
+		// Allow the post types to be filtered (supports having different post types
+		// visible in the REST API vs Simple GraphQL API).
+		$allowed_post_types = apply_filters( 'simple_graphql_api_allowed_post_types', $allowed_post_types );
+
+		// Save the post types as a class property.
+		$this->allowed_post_types = $allowed_post_types;
+
+		return $allowed_post_types;
 	}
 
 	/**
