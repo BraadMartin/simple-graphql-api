@@ -54,9 +54,9 @@ class Simple_GraphQL_API {
 
 		// Register the endpoints.
 		register_rest_route( $base, '/any/', $any_args );
-		register_rest_route( $base, '/posts/(?P<ids>\d+(,\d+)*)?$', $posts_args );
-		register_rest_route( $base, '/terms/(?P<ids>\d+(,\d+)*)?$', $terms_args );
-		register_rest_route( $base, '/comments/(?P<ids>\d+(,\d+)*)?$', $comments_args );
+		register_rest_route( $base, '/posts/(?P<ids>\w+(,\w+)*)?$', $posts_args );
+		register_rest_route( $base, '/terms/(?P<ids>\w+(,\w+)*)?$', $terms_args );
+		register_rest_route( $base, '/comments/(?P<ids>\w+(,\w+)*)?$', $comments_args );
 	}
 
 	/**
@@ -201,6 +201,9 @@ class Simple_GraphQL_API {
 			}
 		}
 
+		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		$response = rest_ensure_response( $response );
+
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
@@ -216,12 +219,16 @@ class Simple_GraphQL_API {
 
 		$params         = $request->get_params();
 		$ids            = array();
+		$filters        = array();
 		$fields         = array();
 		$term_fields    = array();
 		$comment_fields = array();
 
 		if ( isset( $params['ids'] ) ) {
 			$ids = ( is_array( $params['ids'] ) ) ? $params['ids'] : explode( ',', $params['ids'] );
+		}
+		if ( isset( $params['filter'] ) && is_array( $params['filter'] ) ) {
+			$filters = $params['filter'];
 		}
 		if ( isset( $params['fields'] ) ) {
 			$fields = ( is_array( $params['fields'] ) ) ? $params['fields'] : explode( ',', $params['fields'] );
@@ -282,12 +289,32 @@ class Simple_GraphQL_API {
 		$comments = array();
 		$response = new stdClass();
 
+		// If the keyword 'query' is in the IDs array and a 'filter' param is passed,
+		// make a specific query add the matching post IDs to the array.
+		if ( in_array( 'query', $ids ) && ! empty( $filters ) ) {
+
+			// Remove the 'query' keyword from the IDs array.
+			$ids = array_diff( $ids, array( 'query' ) );
+
+			// Make the query and get the matching IDs.
+			$query_ids = $this->get_specific_post_ids( $filters, $params, $request );
+
+			// If we have matching IDs, merge them in with any other passed IDs.
+			if ( ! empty( $query_ids ) ) {
+				$ids = array_merge( $ids, $query_ids );
+			}
+		}
+
+		// Remove any duplicate IDs before making our queries.
+		$ids = array_unique( $ids );
+
 		foreach ( $ids as $id ) {
+
 			$post = $this->get_post( (int)$id, $fields );
 
 			if ( $post ) {
 				if ( is_object( $post ) ) {
-					$posts[]     = $post;
+					$posts[] = $post;
 
 					// Add any terms if terms was a requested field and term_fields was a valid query param.
 					if ( ! empty( $post->terms ) && ! empty( $term_fields ) ) {
@@ -333,6 +360,9 @@ class Simple_GraphQL_API {
 		if ( ! empty( $comments ) ) {
 			$response->comments = $comments;
 		}
+
+		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
@@ -406,6 +436,9 @@ class Simple_GraphQL_API {
 			$response->terms = $terms;
 		}
 
+		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		$response = rest_ensure_response( $response );
+
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
 	}
 
@@ -478,7 +511,77 @@ class Simple_GraphQL_API {
 			$response->comments = $comments;
 		}
 
+		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		$response = rest_ensure_response( $response );
+
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
+	}
+
+	/**
+	 * Return an array of post IDs that match a query made using the passed in filters.
+	 *
+	 * @since   0.8.0
+	 *
+	 * @param   array   $filters  The filter params.
+	 * @param   array   $params   The request params.
+	 * @param   object  $request  The request object.
+	 * @return  array             The array of post IDs.
+	 */
+	public function get_specific_post_ids( $filters, $params, $request ) {
+
+		// Allow custom logic to be used here before we do anything expensive.
+		$custom_query = apply_filters( 'simple_graphql_api_query_post_ids', array(), $filters, $params, $request );
+
+		if ( ! empty( $custom_query ) ) {
+			return $custom_query;
+		}
+
+		$args = array();
+		$posts = array();
+
+		$allowed_args = array(
+			'author__in',
+			'author__not_in',
+			'menu_order',
+			'offset',
+			'order',
+			'orderby',
+			'paged',
+			'post__in',
+			'post__not_in',
+			'posts_per_page',
+			'name',
+			'post_parent__in',
+			'post_parent__not_in',
+			'post_status',
+			'post_type',
+			's',
+		);
+
+		// Allow the allowed query args to be filtered.
+		$allowed_args = apply_filters( 'simple_graphql_api_allowed_query_args', $allowed_args, $filters, $params, $request );
+
+		// Copy only args that are allowed into the $args array.
+		foreach ( $allowed_args as $allowed_arg ) {
+			if ( array_key_exists( $allowed_arg, $filters ) ) {
+				$args[ $allowed_arg ] = $filters[ $allowed_arg ];
+			}
+		}
+
+		if ( ! empty( $args ) ) {
+			$query = new WP_Query();
+			$query_result = $query->query( $args );
+
+			foreach ( $query_result as $post ) {
+				if ( ! $this->check_read_permission( $post ) ) {
+					continue;
+				}
+
+				$posts[] = $post->ID;
+			}
+		}
+
+		return $posts;
 	}
 
 	/**
@@ -495,10 +598,7 @@ class Simple_GraphQL_API {
 		$post = get_post( (int)$id );
 
 		// Only allow certain post types to be accessed.
-		$post_types = apply_filters( 'simple_graphql_api_post_types', array(
-			'post',
-			'page',
-		) );
+		$post_types = $this->get_allowed_post_types();
 
 		// If the post doesn't exist, isn't published, or isn't a valid type,
 		// return an error message.
@@ -540,13 +640,13 @@ class Simple_GraphQL_API {
 				}
 			} elseif ( 'terms' === $field ) {
 
-				// If 'terms' was specified as the field, generate a comma-separated string
+				// If 'terms' was specified as a field, generate a comma-separated string
 				// that contains the IDs for any terms attached to the post.
 				$response->terms = $this->get_term_ids_for_post( $post );
 
 			} elseif ( 'comments' === $field ) {
 
-				// If 'comments' was specified as the field, generate a comma-separated string
+				// If 'comments' was specified as a field, generate a comma-separated string
 				// that contains the IDs for any comments attached to the post.
 				$response->comments = $this->get_comment_ids_for_post( $post );
 
@@ -800,6 +900,66 @@ class Simple_GraphQL_API {
 		);
 
 		return apply_filters( 'simple_graphql_api_private_fields', $private_fields );
+	}
+
+	/**
+	 * Check permissions on a post to determine if we can read it without authentication.
+	 *
+	 * This was taken from class-wp-rest-posts-controller.php in version 2 beta 11 of the REST API plugin,
+	 * and modified slightly to remove checks related to updating a post. Correctly handles posts with
+	 * the inherit status.
+	 *
+	 * @param   object   $post  Post object.
+	 * @return  boolean         Can we read it?
+	 */
+	public function check_read_permission( $post ) {
+		if ( ! empty( $post->post_password ) ) {
+			return false;
+		}
+
+		$post_types = $this->get_allowed_post_types();
+		if ( ! in_array( $post->post_type, $post_types ) ) {
+			return false;
+		}
+
+		// Can we read the post?
+		if ( 'publish' === $post->post_status || current_user_can( $post_type->cap->read_post, $post->ID ) ) {
+			return true;
+		}
+
+		$post_status_obj = get_post_status_object( $post->post_status );
+		if ( $post_status_obj && $post_status_obj->public ) {
+			return true;
+		}
+
+		// Can we read the parent if we're inheriting?
+		if ( 'inherit' === $post->post_status && $post->post_parent > 0 ) {
+			$parent = get_post( $post->post_parent );
+			return $this->check_read_permission( $parent );
+		}
+
+		// If we don't have a parent, but the status is set to inherit, assume
+		// it's published (as per get_post_status()).
+		if ( 'inherit' === $post->post_status ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Return an array of allowed post types.
+	 *
+	 * @since   0.8.0
+	 *
+	 * @return  array  The array of post types.
+	 */
+	public function get_allowed_post_types() {
+
+		return apply_filters( 'simple_graphql_api_post_types', array(
+			'post',
+			'page',
+		) );
 	}
 
 	/**
