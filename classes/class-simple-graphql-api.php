@@ -214,7 +214,7 @@ class Simple_GraphQL_API {
 			}
 		}
 
-		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		// Make it into a proper WP_REST_Response object before passing it to our filter.
 		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
@@ -374,7 +374,7 @@ class Simple_GraphQL_API {
 			$response->comments = $comments;
 		}
 
-		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		// Make it into a proper WP_REST_Response object before passing it to our filter.
 		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
@@ -449,7 +449,7 @@ class Simple_GraphQL_API {
 			$response->terms = $terms;
 		}
 
-		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		// Make it into a proper WP_REST_Response object before passing it to our filter.
 		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
@@ -524,7 +524,7 @@ class Simple_GraphQL_API {
 			$response->comments = $comments;
 		}
 
-		// Make it into a proper WP_REST_Response object before pass it to our filter.
+		// Make it into a proper WP_REST_Response object before passing it to our filter.
 		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
