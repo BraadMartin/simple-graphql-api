@@ -15,7 +15,19 @@ class Simple_GraphQL_API {
 	 *
 	 * @var    array
 	 */
-	public $allowed_post_types;
+	private $allowed_post_types;
+
+	/**
+	 * Safe Meta Mode.
+	 *
+	 * Setting this to false will allow meta keys starting with _ to be
+	 * included in the API response.
+	 *
+	 * @since  0.8.0
+	 *
+	 * @var    bool
+	 */
+	private $safe_meta_mode;
 
 	/**
 	 * The constructor.
@@ -23,9 +35,32 @@ class Simple_GraphQL_API {
 	 * @since  0.8.0
 	 */
 	public function __construct() {
+		// Silence is golden...
+	}
 
-		// Set initial class properties.
-		$this->allowed_post_types = array();
+	/**
+	 * Check whether safe meta mode is enabled.
+	 *
+	 * @since   0.8.0
+	 *
+	 * @return  bool  Whether safe mode is enabled.
+	 */
+	public function check_safe_meta_mode() {
+
+		if ( isset( $this->safe_meta_mode ) ) {
+			return $this->safe_meta_mode;
+		}
+
+		/**
+		 * I'll assume that if you're reading this you know what you're doing.
+		 *
+		 * Return false on this filter to allow all meta, including keys that start
+		 * with _, into the response. Any fields that are specifically marked as
+		 * private will still get stripped out.
+		 */
+		$this->safe_meta_mode = apply_filters( 'simple_graphql_api_safe_meta_mode', true, $id, $fields );
+
+		return $this->safe_meta_mode;
 	}
 
 	/**
@@ -667,9 +702,19 @@ class Simple_GraphQL_API {
 		foreach ( $fields as $field ) {
 			if ( isset( $post->{$field} ) ) {
 
-				// If we are returning post_title or post_content, run it through the right filters
-				// and return both a raw and rendered version to match the REST API.
-				if ( 'post_content' === $field ) {
+				// First check whether the field is marked as private with _ as the first character,
+				// then if we are returning post_title or post_content, run it through the right
+				// filters and return both a raw and rendered version to match the REST API.
+				if ( '_' === substr( $field, 0, 1 ) ) {
+
+					// We have a potentially private field, so only return it if safe meta mode is off.
+					if ( $this->check_safe_meta_mode() ) {
+						$response->{$field} = __( 'Sorry, this key is marked as private. Please see the readme for more information.', 'simple-graphql-api' );
+					} else {
+						$response->{$field} = $post->{$field};
+					}
+
+				} elseif ( 'post_content' === $field ) {
 					$response->post_content             = array();
 					$response->post_content['raw']      = $post->post_content;
 					$response->post_content['rendered'] = apply_filters( 'the_content', $post->post_content );
@@ -680,6 +725,7 @@ class Simple_GraphQL_API {
 				} else {
 					$response->{$field} = ( isset( $post->{$field} ) ) ? $post->{$field} : null;
 				}
+
 			} elseif ( 'terms' === $field ) {
 
 				// If 'terms' was specified as a field, generate a comma-separated string
@@ -693,8 +739,17 @@ class Simple_GraphQL_API {
 				$response->comments = $this->get_comment_ids_for_post( $post );
 
 			} else {
-				$meta = get_post_meta( $post->ID, $field, true );
-				$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
+
+				/* This logic only runs if the meta key wasn't already found on the $post object */
+
+				// If the meta key starts with an underscore and safe meta mode is enabled,
+				// return a message, otherwise let it through.
+				if ( '_' === substr( $field, 0, 1 ) && $this->check_safe_meta_mode() ) {
+					$response->{$field} = __( 'Sorry, this key is marked as private. Please see the readme for more information.', 'simple-graphql-api' );
+				} else {
+					$meta = get_post_meta( $post->ID, $field, true );
+					$response->{$field} = ( ! empty( $meta ) ) ? $meta : '';
+				}
 			}
 		}
 
