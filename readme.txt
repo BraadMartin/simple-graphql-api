@@ -24,11 +24,15 @@ This plugin is an experiment that takes an approach inspired by GraphQL to optim
 
 This plugin also supports setting default fields for each resource using a few filters explained below and then passing the keyword `default` as a field name in the request. You'll get back the defaults you've set up in addition to any other fields you ask for, making this plugin a tool you can use to define custom objects that you can build upon from the client side and that can span multiple WordPress core resource types.
 
+Note: There are security implications when using this plugin that make it unsuitable for certain sites. Please understand the security implications of exposing your site's data over an API in this way, use the provided filters to control how much meta you expose by default, and only use this plugin if you know you are comfortable with how much data it exposes.
+
 Note: Development of this plugin is ongoing and breaking changes may come before 1.0. See the **Development Plans** section below for more information.
 
 = Usage =
 
-Simply pass one or multiple resource ids and the query param "fields" to endpoints for posts, terms, and comments, or send special query params to the /any/ endpoint to query multiple resources across multiple resource types in a single request, and you'll get back exactly what you ask for. The endpoints supported by this plugin include:
+Simply pass one or multiple resource ids and the query param "fields" to endpoints for posts, terms, and comments, or send special query params to the /any/ endpoint to query multiple resources across multiple resource types in a single request, and you'll get back exactly what you ask for. You can also make traditional queries using a "query" keyword and a WP-API-style filter system described below.
+
+The endpoints supported by this plugin include:
 
 `
 /wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx&term_fields=xxx,xxx&comment_fields=xxx,xxx
@@ -79,28 +83,19 @@ Response:
 }
 `
 
-Here is a prettier way to send the request using jQuery's `$.ajax()` that is also supported:
+Or, if you'd rather make a traditional query, you can use the keyword "query" in your IDs list and then pass a number of "filter" query params to make a query. This works by itself or with additional IDs also specified:
 
 `
-$.ajax({
-	url: 'http://wp.dev/wp-json/graph/v1/posts/13,17', // Your URL goes here.
-	type: 'get',
-	data: {
-		fields: [ // Your fields go here.
-			'ID',
-			'post_title',
-			'post_content',
-			'some_custom_field'
-		]
-	},
-	success: function( response ) {
-		console.log( response ); // Your object will be here.
-	}
-});
+// Get posts from author "braad".
+/wp-json/graph/v1/posts/query?fields=ID,post_title&filter[author_name]=braad
+
+// Get posts with ID 1 and 2 and up to 5 posts that match a search for "WordPress"
+/wp-json/graph/v1/posts/1,2,query?fields=ID,post_title&filter[s]=WordPress&filter[posts_per_page]=5
 `
+
+The complete list of allowed filter params can be found below, and there is a filter `simple_graphql_api_allowed_query_args` that lets you control which filter params are allowed.
 
 Currently this plugin supports 3 of the 4 core WordPress resources: **Posts**, **Terms**, and **Comments**. Support for **Users** is planned but Users should really only be accessed with authenticated requests, and right now this plugin only offers a read-only interface (only GET requests), so this will likely come later as part of a larger push to add support for authenticated requests.
-
 
 Terms and comments can be queried just like posts using the **/terms/** and **/comments/** endpoints:
 
@@ -147,6 +142,8 @@ Results in:
   ]
 }
 `
+
+Terms and Comments don't yet support making traditional queries using filter query params, but this is planned for a future version of the plugin.
 
 Querying multiple posts, terms, and comments at a time is alright, but the true power of GraphQL lies in the ability to query across resource types. This plugin implements this ability with the **/any/** endpoint. This endpoint accepts params `posts`, `post_fields`, `terms`, `term_fields`, `comments`, and `comment_fields`, and can be queried like this:
 
@@ -251,9 +248,89 @@ It is always recommended, however, to be aware of whether your fields are living
 
 = Special Keywords =
 
-This plugin includes special keywords **terms**, **comments**, and **default** that you can pass as field names to support specific use cases.
+This plugin includes special keywords **query**, **terms**, **comments**, and **default** that you can pass as field names to support specific use cases.
 
-The fundamental query mechanism with Simple GraphQL API revolves around resource IDs, but a common use case for WordPress sites is getting a collection of posts or a specific post and also wanting the terms and comments associated with that post. It would be a shame to have to make multiple requests to get all of this at once. This plugin supports this use case with the **terms** and **comments** keywords.
+Although the fundamental query mechanism in Simple GraphQL API revolves around resource IDs, in reality you don't always know the resource IDs you want. The official REST API supports making traditional queries with a series of filter query params, and this plugin supports an identical filter syntax for making traditional queries. Simply pass the **query** keyword in the list of IDs to include a traditional query, and then include the filter params:
+
+`
+// Get posts from author "braad".
+/wp-json/graph/v1/posts/query?fields=ID,post_title&filter[author_name]=braad
+
+// Get posts with ID 1 and 2 and up to 5 posts that match a search for "WordPress"
+/wp-json/graph/v1/posts/1,2,query?fields=ID,post_title&filter[s]=WordPress&filter[posts_per_page]=5
+`
+
+The full list of default allowed filter params is:
+
+`
+author
+author__in
+author__not_in
+author_name
+cat
+category__and
+category__in
+category__not_in
+category_name
+day
+hour
+ignore_sticky_posts
+m
+menu_order
+meta_compare
+meta_key
+meta_value
+meta_value_num
+minute
+monthnum
+name
+nopaging
+offset
+order
+orderby
+p
+page
+paged
+pagename
+post__in
+post__not_in
+post_name__in
+post_parent
+post_parent__in
+post_parent__not_in
+post_type
+posts_per_page
+s
+second
+tag
+tag__and
+tag__in
+tag__not_in
+tag_id
+tag_slug__and
+tag_slug__in
+w
+year
+`
+
+You can see that almost all types of queries are supported, but some notable params are not supported by default:
+
+`
+date_query
+fields
+has_password
+post_password
+post_status
+perm
+meta_query
+tax_query
+`
+
+The reason why `date_query`, `tax_query`, and `meta_query` are not yet supported is simply because they take array arguments and I'm not yet sure how to handle this in a URL string. The `fields` param doesn't make much sense given that this plugin provides other methods for specifying fields, and `has_password`, `post_password`, `perm` and `post_status` are not supported because only published posts without a password are available over the API.
+
+Naturally the allowed filter params can be customized with the `simple_graphql_api_allowed_query_args` filter, so you can always add these back in.
+
+Another common use case for WordPress sites is getting a collection of posts or a specific post and also wanting the terms and comments associated with that post. It would be a shame to have to make multiple requests to get all of this at once. This plugin supports this use case with the **terms** and **comments** keywords.
 
 To get the term IDs and comment IDs associated with a post you can simply pass "terms" and "comments" as fields you want when querying the `/posts/` endpoint:
 
