@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Simple GraphQL API 0.8.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/simple-graphql-api\n"
-"POT-Creation-Date: 2016-02-06 17:05:58+00:00\n"
+"POT-Creation-Date: 2016-02-08 15:40:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,55 +14,62 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: grunt-wp-i18n 0.5.3\n"
 
-#: classes/class-simple-graphql-api.php:289
+#: classes/class-simple-graphql-api.php:324
 msgid "No valid post ids specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:295
+#: classes/class-simple-graphql-api.php:330
 msgid "No valid post fields specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:417
+#: classes/class-simple-graphql-api.php:452
 msgid "No valid term ids specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:423
+#: classes/class-simple-graphql-api.php:458
 msgid "No valid term fields specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:492
+#: classes/class-simple-graphql-api.php:527
 msgid "No valid comment ids specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:498
+#: classes/class-simple-graphql-api.php:533
 msgid "No valid comment fields specified"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:649
+#: classes/class-simple-graphql-api.php:684
 msgid "No post with ID %s found"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:654
+#: classes/class-simple-graphql-api.php:689
 msgid "Post with ID %s is not published"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:659
+#: classes/class-simple-graphql-api.php:694
 msgid "Permission denied for post with ID %s"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:729
+#: classes/class-simple-graphql-api.php:712
+#: classes/class-simple-graphql-api.php:748
+msgid ""
+"Sorry, this key is marked as private. Please see the readme for more "
+"information."
+msgstr ""
+
+#: classes/class-simple-graphql-api.php:784
 msgid "No term with ID %s found"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:838
+#: classes/class-simple-graphql-api.php:893
 msgid "No approved comment with ID %s found"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:843
+#: classes/class-simple-graphql-api.php:898
 msgid "Comment with ID %s has not been approved"
 msgstr ""
 
-#: classes/class-simple-graphql-api.php:848
+#: classes/class-simple-graphql-api.php:903
 msgid "Disallowed comment type for comment with ID %s"
 msgstr ""
 

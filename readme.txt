@@ -44,7 +44,7 @@ The endpoints supported by this plugin include:
 /wp-json/graph/v1/any/?posts={:ids}&post_fields=xxx,xxx&terms={:ids}&term_fields=xxx,xxx&comments={:ids}&comment_fields=xxx,xxx
 `
 
-To query the **/posts/** endpoint send a request to `/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx` where `{:ids}` is a comma separated list of the post ids you want and `xxx,xxx` is a comma separated list of the fields you want, and you'll get only those fields back.
+To return specific posts by ID from the **/posts/** endpoint send a request to `/wp-json/graph/v1/posts/{:ids}?fields=xxx,xxx` where `{:ids}` is a comma separated list of the post ids you want and `xxx,xxx` is a comma separated list of the fields you want, and you'll get only those fields back.
 
 Request:
 
@@ -238,6 +238,8 @@ Results in:
 }
 `
 
+Having an errors array in the response like this allows for errors to be returned for any resources in a collection without preventing the API from returning the resources that are valid, but it's a quick solution that is probably not as robust as it needs to be, so expect that this might be improved in a future version.
+
 = Fields =
 
 The fields you can specify are a direct mapping to the fields on the post, term, and comment objects you get when you call `get_post()`, `get_term()`, and `get_comments()` in WordPress. Any fields you ask for that are not valid keys on the post/term/comment object will be treated as meta keys, and any matching meta values will be included in the response. This means that there is no formal distinction between core fields and meta fields. There are only field names, and they either have a matching value or they don't.
@@ -245,6 +247,23 @@ The fields you can specify are a direct mapping to the fields on the post, term,
 Blurring the distinction between core fields and meta fields like this lets you think about custom resource objects in purely abstract terms. From the perspective of the API the basic resource types (Posts, Terms, and Comments) don't have any defined structure other than what you want them to have. You have complete freedom to make use of only the fields you care about and ignore the rest.
 
 It is always recommended, however, to be aware of whether your fields are living on the WordPress resource itself (in the main posts, terms, and comments tables) or in meta (in the postmeta, termmeta, or commentmeta tables). Responses will generally always be faster when less meta is involved, so abuse the core fields before abusing meta if possible.
+
+= Meta =
+
+Meta is tricky, so much so that as of February 2016 the core REST API is still working out how to handle meta. At the core of the issue are several things:
+
+* Although WordPress Core does have a formal way to register meta (using `register_meta()`), it isn't commonly used, and there is no great way to define a meta key as being private vs. public
+* All post meta keys that start with an underscore (`_`) are hidden from the default Custom Fields meta box on the post edit screens, but this distinction is mostly about UI rather than truly indicating private vs. public
+* PHP can store serialized arrays and objects in the database as meta values, but JSON doesn't distinguish between objects and associative arrays, so when working with the API response on the client side a distinction can't be made, and if you tried to update a serialized object or array over the API then PHP wouldn't be able to distinguish between object and associative array
+* In some cases the default Custom Fields meta box is used by authors to write quick notes or store other internal/private information, and exposing this information over the API could be problematic
+
+These issues make handling meta properly very difficult, at least across every WordPress install in the world automatically. Since this plugin offers a read-only interface, the issue of updating meta in the database isn't yet a concern, but exposing private meta unintentionally is a problem.
+
+I don't have a better answer for this than the team working on the REST API, but I also am developing this plugin to be developer friendly and I think meta access is critical, so for now Simple GraphQL API will disallow all meta fields that are prefixed with `_` unless "Safe Meta Mode" is disabled. If Safe Meta Mode is disabled then all meta keys will be accessible over the API, so please only turn Safe Meta Mode off if you know what you are doing. You can turn it off with a filter like this:
+
+`
+add_filter( 'simple_graphql_api_safe_meta_mode', '__return_false' );
+`
 
 = Special Keywords =
 
