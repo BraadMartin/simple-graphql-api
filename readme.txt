@@ -22,7 +22,7 @@ This plugin is an experiment that takes an approach inspired by GraphQL to optim
 
 This plugin also supports setting default fields for each resource using a few filters explained below and then passing the keyword `default` as a field name in the request. You'll get back the defaults you've set up in addition to any other fields you ask for, making this plugin a tool you can use to define custom objects that you can build upon from the client side and that can span multiple WordPress core resource types.
 
-**Note**: There are security implications when using this plugin that make it unsuitable for most sites, specifically sites that store sensitive information in meta. Please read the **Meta** section below, make sure you understand the security implications of exposing your site's data over an API in this way, use the provided filters to control how much meta you expose by default, and only use this plugin if you know you are comfortable with how much data it exposes.
+**Note**: There are security implications when using this plugin that make it unsuitable for most sites, specifically sites that store sensitive information in meta. Please read the **Meta** section below and make sure you understand the security implications of exposing your site's data over an API in this way. Use the provided filters to control how much meta you expose by default, and only use this plugin if you know you are comfortable with how much data it exposes.
 
 **Note**: Development of this plugin is ongoing and breaking changes may come before 1.0. See the **Development Plans** section below for more information.
 
