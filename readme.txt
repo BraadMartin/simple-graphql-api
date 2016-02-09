@@ -8,23 +8,21 @@ Stable tag: 0.8.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types in a single request and designing custom objects.
+A simple read-only interface for making GraphQL-style queries with the REST API. Supports querying multiple resources across multiple resource types in a single request.
 
 == Description ==
-
-This plugin is all about easily designing custom API responses for the core WordPress resources from both the client and server side.
 
 Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/post/13` and you get back a JSON representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent the current "state" of that resource.
 
 GraphQL is a query language/API interface developed by Facebook that offers a different way of asking for and receiving data for a resource. With GraphQL you pass in an object with only the field keys you want, and the API fills up the object and passes it back to you. This allows you to define the object you want to work with from the client side, and simply let the API do the work of filling up the fields you ask for.
 
-In the context of the 4 main WordPress resources (Posts, Terms, Comments, and Users), there are always the core fields plus any meta fields. If you want to add any extra meta fields ("custom fields") to the response you get from the core REST API endpoints you would register the extra fields you want in the response on the server side in PHP, and this is easily done and works great for many use cases. This allows you to define the object you want to work with on the server side by adding fields, but you would never want to remove any of the core fields from the response because this would be disruptive to any other applications trying to connect to the site over the REST API and expecting certain fields to be there, so there is always a minimum of data you'll get back in the response and some of that data your app or website might not actually use.
+In the context of the 4 main WordPress resources (Posts, Terms, Comments, and Users), there are always the core fields plus any meta fields. If you want to add any extra meta fields ("custom fields") to the response you get from the core REST API endpoints you would register the extra fields you want in the response on the server side in PHP, and this is easily done and works great for many use cases, but unless you start removing fields from the default response you'll generally always get back some data that you don't end up using.
 
-This plugin is an experiment that takes an approach inspired by GraphQL to optimize the data returned in the response and provide flexibility from the client side when making the request. It lets you ask for specific fields on the core resources without regard for whether they live in the primary table (posts, terms, comments, users) or in the meta tables (postmeta, termmeta, commentmeta, usermeta), and without requiring any prior field registration on the server side. This allows you to define the object you want to work with from the client side and craft responses that are specific to your use case, and it naturally leads to smaller responses, all while taking advantage of the same object caching used by the REST API.
+This plugin is an experiment that takes an approach inspired by GraphQL to optimize the data returned in the response and provide flexibility from the client side when making the request. It lets you ask for specific fields on the core resources without regard for whether they live in the primary tables (posts, terms, comments, users) or in the meta tables (postmeta, termmeta, commentmeta, usermeta), and without requiring any prior field registration on the server side. This allows you to define the object you want to work with from the client side and craft responses that are specific to your use case, and it naturally leads to smaller responses, all while taking advantage of the same object caching used by the REST API.
 
 This plugin also supports setting default fields for each resource using a few filters explained below and then passing the keyword `default` as a field name in the request. You'll get back the defaults you've set up in addition to any other fields you ask for, making this plugin a tool you can use to define custom objects that you can build upon from the client side and that can span multiple WordPress core resource types.
 
-**Note**: There are security implications when using this plugin that make it unsuitable for most sites. Please understand the security implications of exposing your site's data over an API in this way, use the provided filters to control how much meta you expose by default, and only use this plugin if you know you are comfortable with how much data it exposes.
+**Note**: There are security implications when using this plugin that make it unsuitable for most sites, specifically sites that store sensitive information in meta. Please read the **Meta** section below, make sure you understand the security implications of exposing your site's data over an API in this way, use the provided filters to control how much meta you expose by default, and only use this plugin if you know you are comfortable with how much data it exposes.
 
 **Note**: Development of this plugin is ongoing and breaking changes may come before 1.0. See the **Development Plans** section below for more information.
 
@@ -238,7 +236,7 @@ Results in:
 }
 `
 
-Having an errors array in the response like this allows for errors to be returned for any resources in a collection without preventing the API from returning the resources that are valid, but it's a quick solution that is probably not as robust as it needs to be, so expect that this might be improved in a future version.
+Having an errors array in the response like this allows for errors to be returned for any resources in a collection without preventing the API from returning the resources that are valid, but it's a quick solution that is probably not as robust as it needs to be, so expect that this will be improved in a future version.
 
 = Fields =
 
@@ -246,20 +244,20 @@ The fields you can specify are a direct mapping to the fields on the post, term,
 
 Blurring the distinction between core fields and meta fields like this lets you think about custom resource objects in purely abstract terms. From the perspective of the API the basic resource types (Posts, Terms, and Comments) don't have any defined structure other than what you want them to have. You have complete freedom to make use of only the fields you care about and ignore the rest.
 
-It is always recommended, however, to be aware of whether your fields are living on the WordPress resource itself (in the main posts, terms, and comments tables) or in meta (in the postmeta, termmeta, or commentmeta tables). Responses will generally always be faster when less meta is involved, so abuse the core fields before abusing meta if possible.
+It is always recommended, however, to be aware of whether your fields are living on the WordPress resource itself (in the main posts, terms, and comments tables) or in meta (in the postmeta, termmeta, or commentmeta tables). Responses will generally always be faster when less meta is involved, so when designing custom objects it's a good idea to abuse the core fields before abusing meta if possible.
 
 = Meta =
 
 Meta is tricky, so much so that as of February 2016 the core REST API is still working out how to handle meta. At the core of the issue are several things:
 
-* Although WordPress Core does have a formal way to register meta (using `register_meta()`), it isn't commonly used, and there is no great way to define a meta key as being private vs. public
+* Although WordPress Core does have a formal way to register meta (using `register_meta()`), this function isn't commonly used, and there is no great way to define a meta key as being private vs. public
 * All post meta keys that start with an underscore (`_`) are hidden from the default Custom Fields meta box on the post edit screens, but this distinction is mostly about UI rather than truly indicating private vs. public
-* PHP can store serialized arrays and objects in the database as meta values, but JSON doesn't distinguish between objects and associative arrays, so when working with the API response on the client side a distinction can't be made, and if you tried to update a serialized object or array over the API then PHP wouldn't be able to distinguish between object and associative array
-* In some cases the default Custom Fields meta box is used by authors to write quick notes or store other internal/private information, and exposing this information over the API could be problematic
+* PHP can store serialized arrays and objects in the database as meta values, but JSON doesn't distinguish between objects and associative arrays, so when working with the API response on the client side a distinction can't be made, and if you tried to update a serialized object or array over the API then PHP wouldn't be able to distinguish between object and associative array when saving it in the database
+* In some cases the default Custom Fields meta box is used by authors to write quick notes or store other internal/private information, and thus exposing this information over the API could be problematic
 
-These issues make handling meta properly very difficult, at least across every WordPress install in the world automatically. Since this plugin offers a read-only interface, the issue of updating meta in the database isn't yet a concern, but exposing private meta unintentionally is a problem.
+These issues make handling meta properly very difficult, especially across every WordPress install in the world automatically. Since this plugin offers a read-only interface, the issue of updating meta in the database isn't yet a concern, but exposing private meta unintentionally is still a problem.
 
-I don't have a better answer for this than the team working on the REST API, but I also am developing this plugin to be developer friendly and I think meta access is critical, so for now Simple GraphQL API will disallow all meta fields that are prefixed with `_` unless "Safe Meta Mode" is disabled. If Safe Meta Mode is disabled then all meta keys will be accessible over the API, so please only turn Safe Meta Mode off if you know what you are doing. You can turn it off with a filter like this:
+I don't have a better answer for this than the team working on the REST API, but I am developing this plugin to be developer friendly and I think meta access is critical, so for now Simple GraphQL API will disallow all meta fields that are prefixed with `_` unless "Safe Meta Mode" is disabled. If Safe Meta Mode is disabled then all meta keys will be accessible over the API, so please only turn Safe Meta Mode off if you know what you are doing. You can turn it off with the `simple_graphql_api_safe_meta_mode` filter like this:
 
 `
 add_filter( 'simple_graphql_api_safe_meta_mode', '__return_false' );
