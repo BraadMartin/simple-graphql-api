@@ -682,17 +682,17 @@ class Simple_GraphQL_API {
 		if ( is_wp_error( $post ) || ! is_object( $post ) ) {
 			return sprintf(
 				__( 'No post with ID %s found', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		} elseif ( 'publish' !== $post->post_status ) {
 			return sprintf(
 				__( 'Post with ID %s is not published', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		} elseif ( ! $this->check_read_permission( $post ) ) {
 			return sprintf(
 				__( 'Permission denied for post with ID %s', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		}
 
@@ -782,7 +782,7 @@ class Simple_GraphQL_API {
 		if ( is_wp_error( $term ) || ! is_object( $term ) ) {
 			return sprintf(
 				__( 'No term with ID %s found', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		}
 
@@ -891,17 +891,17 @@ class Simple_GraphQL_API {
 		if ( is_wp_error( $comment ) || ! is_object( $comment ) ) {
 			return sprintf(
 				__( 'No approved comment with ID %s found', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		} elseif ( '1' !== $comment->comment_approved ) {
 			return sprintf(
 				__( 'Comment with ID %s has not been approved', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		} elseif ( ! in_array( $comment->comment_type, $comment_types ) ) {
 			return sprintf(
 				__( 'Disallowed comment type for comment with ID %s', 'simple-graphql-api' ),
-				$id
+				esc_attr( $id )
 			);
 		}
 
