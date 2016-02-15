@@ -459,7 +459,7 @@ Results in:
 
 You can see that you're not limited to getting the default fields back when you use the **default** keyword. You'll get back the default fields that you specify using the filters *and* you'll get back any additional fields that you pass in on the "fields" query param. The filters get passed the standard REST API request object that contains any additional passed in parameters, allowing you to serve different custom default objects when different additional query params are included.
 
-Building the default objects is as simple as:
+Building a default object is as simple as:
 
 
 	add_filter( 'simple_graphql_api_default_post_fields', 'xxx_custom_default_post_fields', 10, 2 );
@@ -509,11 +509,9 @@ Please be safe when using this plugin, and don't expose more data than you mean 
 
 ### Development Plan ###
 
-I'm still learning about GraphQL and I'm using this plugin mostly to experiment. If this plugin proves useful I would love to keep building it out and add more ways to query resources (other than just by ID) and support for interacting with User resources and making authenticated requests to actually modify resources with PUT, POST, and DELETE requests.
+I'm still learning about GraphQL and I'm using this plugin mostly to experiment. If this plugin proves useful I would love to keep building it out, and if anyone out there finds this kind of thing interesting I'd love to work together.
 
-The first release of this plugin is version 0.8.0, with the intention that although the plugin is generally stable and ready to be used, there may be **breaking changes** made before the plugin hits 1.0. I wanted to get the plugin out there and get feedback on it early, but I know it still has a lot of room for improvement. Please help me make it better by letting me know if you find it useful and what if any changes you'd like to see.
-
-If anyone out there finds this kind of thing interesting I'd love to work together. The plugin is on [on Github](https://github.com/BraadMartin/simple-graphql-api "Simple GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
+The first release of this plugin is version 0.8.0, with the intention that although the plugin is generally stable and ready to be used, there may be **breaking changes** made before the plugin hits 1.0. I wanted to get the plugin out there and get feedback on it early, but I know it still has a lot of room for improvement. Please help me make it better by letting me know if you find it useful and what if any changes you'd like to see. The plugin is on [on Github](https://github.com/BraadMartin/simple-graphql-api "Simple GraphQL API for WordPress") and issue filing and pull requests are always welcome. :)
 
 ## Installation ##
 
