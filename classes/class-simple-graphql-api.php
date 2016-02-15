@@ -314,17 +314,21 @@ class Simple_GraphQL_API {
 
 		// If the keyword 'query' is in the IDs array and a 'filter' param is passed,
 		// make a specific query add the matching post IDs to the array.
-		if ( in_array( 'query', $ids ) && ! empty( $filters ) ) {
+		if ( in_array( 'query', $ids ) ) {
 
 			// Remove the 'query' keyword from the IDs array.
 			$ids = array_diff( $ids, array( 'query' ) );
 
-			// Make the query and get the matching IDs.
-			$query_ids = $this->get_specific_post_ids( $filters, $params, $request );
+			// Only make a query if at least one filter was passed.
+			if ( ! empty( $filters ) ) {
 
-			// If we have matching IDs, merge them in with any other passed IDs.
-			if ( ! empty( $query_ids ) ) {
-				$ids = array_merge( $ids, $query_ids );
+				// Make the query and get the matching IDs.
+				$query_ids = $this->get_specific_post_ids( $filters, $params, $request );
+
+				// If we have matching IDs, merge them in with any other passed IDs.
+				if ( ! empty( $query_ids ) ) {
+					$ids = array_merge( $ids, $query_ids );
+				}
 			}
 		}
 
@@ -560,7 +564,7 @@ class Simple_GraphQL_API {
 		 * with _, into the response. Any fields that are specifically marked as
 		 * private will still get stripped out.
 		 */
-		$this->safe_meta_mode = apply_filters( 'simple_graphql_api_safe_meta_mode', true, $id, $fields );
+		$this->safe_meta_mode = apply_filters( 'simple_graphql_api_safe_meta_mode', true );
 
 		return $this->safe_meta_mode;
 	}
