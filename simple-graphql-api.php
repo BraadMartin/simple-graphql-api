@@ -9,7 +9,7 @@
  * @wordpress-plugin
  * Plugin Name:         Simple GraphQL API
  * Plugin URI:          https://github.com/BraadMartin/simple-graphql-api
- * Description:         Adds a GraphQL-inpsired interface for the REST API that lets you design custom API responses for the core WordPress resources from both the client and server side.
+ * Description:         Adds a GraphQL-inpsired interface for the REST API that lets you design custom API responses for the core WordPress resources from both the client and server.
  * Version:             0.8.0
  * Author:              Braad Martin
  * Author URI:          http://braadmartin.com
