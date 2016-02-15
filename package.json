@@ -1,7 +1,7 @@
 {
   "name": "simple-graphql-api",
   "version": "0.8.0",
-  "description": "Adds a GraphQL-inpsired interface for the REST API that lets you design custom API responses for the core WordPress resources from both the client and server side.",
+  "description": "Adds a GraphQL-inpsired interface for the REST API that lets you design custom API responses for the core WordPress resources from both the client and server.",
   "main": "Gruntfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

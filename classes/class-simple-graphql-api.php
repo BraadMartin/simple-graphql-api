@@ -39,31 +39,6 @@ class Simple_GraphQL_API {
 	}
 
 	/**
-	 * Check whether safe meta mode is enabled.
-	 *
-	 * @since   0.8.0
-	 *
-	 * @return  bool  Whether safe mode is enabled.
-	 */
-	public function check_safe_meta_mode() {
-
-		if ( isset( $this->safe_meta_mode ) ) {
-			return $this->safe_meta_mode;
-		}
-
-		/**
-		 * I'll assume that if you're reading this you know what you're doing.
-		 *
-		 * Return false on this filter to allow all meta, including keys that start
-		 * with _, into the response. Any fields that are specifically marked as
-		 * private will still get stripped out.
-		 */
-		$this->safe_meta_mode = apply_filters( 'simple_graphql_api_safe_meta_mode', true, $id, $fields );
-
-		return $this->safe_meta_mode;
-	}
-
-	/**
 	 * Initialize all the things.
 	 *
 	 * @since  0.8.0
@@ -563,6 +538,31 @@ class Simple_GraphQL_API {
 		$response = rest_ensure_response( $response );
 
 		return apply_filters( 'simple_graphql_api_response', $response, $request, $params );
+	}
+
+	/**
+	 * Check whether safe meta mode is enabled.
+	 *
+	 * @since   0.8.0
+	 *
+	 * @return  bool  Whether safe mode is enabled.
+	 */
+	public function check_safe_meta_mode() {
+
+		if ( isset( $this->safe_meta_mode ) ) {
+			return $this->safe_meta_mode;
+		}
+
+		/**
+		 * I'll assume that if you're reading this you know what you're doing.
+		 *
+		 * Return false on this filter to allow all meta, including keys that start
+		 * with _, into the response. Any fields that are specifically marked as
+		 * private will still get stripped out.
+		 */
+		$this->safe_meta_mode = apply_filters( 'simple_graphql_api_safe_meta_mode', true, $id, $fields );
+
+		return $this->safe_meta_mode;
 	}
 
 	/**
