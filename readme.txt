@@ -12,7 +12,7 @@ A simple read-only interface for making GraphQL-style queries with the REST API.
 
 == Description ==
 
-Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/post/13` and you get back a JSON representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent the current "state" of that resource.
+Normally with the WordPress REST API and REST APIs in general, you are interacting with a complete object representation of a resource. You ask for a post at `/wp-json/wp/v2/posts/13` and you get back a JSON representation of that post, with all of the standard fields that you would expect. You don't have to specify which fields you get back, you just get back a complete set of fields that represent the current "state" of that resource.
 
 GraphQL is a query language/API interface developed by Facebook that offers a different way of asking for and receiving data for a resource. With GraphQL you pass in an empty object with only the field keys you want, and the API fills up the object and passes it back to you. This allows you to define the object you want to work with from the client side, and simply let the API do the work of filling up the fields you ask for.
 
